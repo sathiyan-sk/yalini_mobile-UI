@@ -24,6 +24,7 @@ export const colors = {
   warning: "#EA580C",
   warningSoft: "#FFEDD5",
   error: "#DC2626",
+  errorSoft: "#FEE2E2",
   info: "#2563EB",
   
     // Vehicle specific
@@ -56,6 +57,7 @@ export const spacing = {
   lg: 16,
   xl: 24,
   xxl: 32,
+  xxxl: 30,
 } as const;
 
 export const radius = {

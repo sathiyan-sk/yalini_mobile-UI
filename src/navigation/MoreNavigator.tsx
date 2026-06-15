@@ -7,6 +7,9 @@ import MyBusinessScreen from "../screens/adminScreens/MyBusiness/MyBusinessScree
 import AddBusinessScreen from "../screens/adminScreens/MyBusiness/AddBusinessScreen";
 import EditBusinessScreen from "../screens/adminScreens/MyBusiness/EditBusinessScreen";
 import type { MoreStackParamList } from "./types";
+import VehiclesNavigator from "./VehiclesNavigator";
+
+
 const Stack = createNativeStackNavigator<MoreStackParamList>();
 
 /**
@@ -46,16 +49,7 @@ export default function MoreNavigator() {
         )}
       </Stack.Screen>
 
-      <Stack.Screen name="Vehicles">
-        {() => (
-          <PlaceholderScreen
-            title="Vehicles"
-            icon="truck"
-            description="Vehicle inventory, RC details and assignments will appear here."
-            testID="vehicles-screen"
-          />
-        )}
-      </Stack.Screen>
+      <Stack.Screen name="Vehicles" component={VehiclesNavigator} />
 
       <Stack.Screen name="Hotels">
         {() => (

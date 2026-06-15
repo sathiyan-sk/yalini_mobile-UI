@@ -106,7 +106,7 @@ const styles = StyleSheet.create({
     fontWeight: "500",
   },
   statValue: {
-    fontSize: fontSize.xxxl,
+    fontSize: fontSize.xxl,
     fontWeight: "700",
     color: colors.textPrimary,
   },
