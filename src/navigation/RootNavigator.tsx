@@ -6,11 +6,12 @@ import {
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { StatusBar } from "expo-status-bar";
 
-import { AppTabBar } from "../../src/navigation/AppTabBar";
-import type { RootTabParamList } from "../../src/navigation/types";
+import { AppTabBar } from "./AppTabBar";
+import type { RootTabParamList } from "./types";
 import DashboardScreen from "../screens/adminScreens/Dashboard/DashboardScreen";
-import { PlaceholderScreen } from "../../src/screens/PlaceholderScreen";
+import { PlaceholderScreen } from "../screens/PlaceholderScreen";
 import MoreNavigator from "./MoreNavigator";
+import EmployeesNavigator from "./EmployeesNavigator";
 
 const Tab = createBottomTabNavigator<RootTabParamList>();
 
@@ -49,16 +50,7 @@ export default function RootNavigator() {
               />
             )}
           </Tab.Screen>
-          <Tab.Screen name="Employees">
-            {() => (
-              <PlaceholderScreen
-                title="Employees"
-                icon="users"
-                description="Employee management and payroll will appear here."
-                testID="employees-screen"
-              />
-            )}
-          </Tab.Screen>
+          <Tab.Screen name="Employees" component={EmployeesNavigator} />
           <Tab.Screen name="More">
             {() => (
               <MoreNavigator />
