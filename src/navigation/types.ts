@@ -5,6 +5,17 @@ export type RootTabParamList = {
   Employees: undefined;
   More: undefined;
 };
+
+/**
+ * Native-stack screens for the Employees tab.
+ * EmployeesList is the entry point; Add/Edit screens handle CRUD.
+ */
+export type EmployeesStackParamList = {
+  EmployeesList: undefined;
+  AddEmployee: undefined;
+  EditEmployee: { employeeId: string };
+};
+
 /**
  * Native-stack screens reachable from the \"More\" tab.
  * `Settings` is the entry point; `MyBusiness` mounts a full CRUD flow
