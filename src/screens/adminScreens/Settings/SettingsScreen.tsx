@@ -12,6 +12,7 @@ import { SettingsSectionLabel } from "./components/SettingsSectionLabel";
 import { SettingsRowCard } from "./components/SettingsRowCard";
 import { LogoutConfirmSheet } from "./components/LogoutConfirmSheet";
 import { ACCOUNT_SECTION, SETTINGS_SECTIONS } from "./data/settingsItems";
+import type { SettingsDestination } from "./types";
 
 /** Reserve room for the floating bottom tab bar (matches DashboardScreen). */
 const TAB_BAR_CLEARANCE = 72;
@@ -38,7 +39,7 @@ export default function SettingsScreen() {
   const [logoutSheetVisible, setLogoutSheetVisible] = useState(false);
 
   const handleRowPress = useCallback(
-    (destination: Exclude<keyof MoreStackParamList, "Settings">) => {
+    (destination: SettingsDestination) => {
       navigation.navigate(destination);
     },
     [navigation],

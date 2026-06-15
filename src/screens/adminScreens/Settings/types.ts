@@ -9,6 +9,19 @@ export interface SettingsRowIcon {
   /** Background tile + icon accent tone (matches src/theme tones). */
   tone: ToneKey;
 }
+/**
+ * Screens a settings row may navigate to.
+ *
+ * Limited to param-less destinations inside the More stack — a row tap
+ * can't supply route params, so screens that require them (e.g.
+ * `EditBusiness`, which needs a `businessId`) are excluded at the type
+ * level. This keeps `navigation.navigate(destination)` fully type-safe.
+ */
+export type SettingsDestination = {
+  [Key in Exclude<keyof MoreStackParamList, "Settings">]: MoreStackParamList[Key] extends undefined
+    ? Key
+    : never;
+}[Exclude<keyof MoreStackParamList, "Settings">];
 
 /**
  * Single tappable row in the Settings screen.
@@ -20,7 +33,7 @@ export interface SettingsRow {
   subtitle: string;
   icon: SettingsRowIcon;
   /** Target screen registered on MoreStackParamList — keeps placeholders type-safe. */
-  destination: Exclude<keyof MoreStackParamList, "Settings">;
+  destination: SettingsDestination;
 }
 
 /**
