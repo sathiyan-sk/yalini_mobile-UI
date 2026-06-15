@@ -6,9 +6,9 @@
  * start (matches the reference design).
  */
 
-import { getItem, setItem } from "../../src/utils/storage";
-import { HOTEL_STORAGE_KEY } from "../screens/Hotels/data/constants";
-import type { Hotel, HotelFormValues } from "../screens/Hotels/types";
+//import { getItem, setItem } from "../utils/storage";(no file code in storage path)
+import { HOTEL_STORAGE_KEY } from "../screens/adminScreens/Hotels/data/constants";
+import type { Hotel, HotelFormValues } from "../screens/adminScreens/Hotels/types";
 
 /** Strict ISO date (YYYY-MM-DD) for `createdAt`. */
 function todayISODate(): string {

@@ -14,8 +14,7 @@ import {
   loadHotels,
   updateHotel,
 } from "../services/hotelService";
-import type { Hotel, HotelFormValues } from "../../screens/Hotels/types";
-
+import type { Hotel, HotelFormValues } from "../screens/adminScreens/Hotels/types";
 type Listener = (snapshot: Hotel[]) => void;
 
 let cache: Hotel[] | null = null;

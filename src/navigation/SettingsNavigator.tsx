@@ -6,6 +6,7 @@ import MyBusinessScreen from "../screens/adminScreens/MyBusiness/MyBusinessScree
 import AddBusinessScreen from "../screens/adminScreens/MyBusiness/AddBusinessScreen";
 import EditBusinessScreen from "../screens/adminScreens/MyBusiness/EditBusinessScreen";
 import VehiclesNavigator from "./VehiclesNavigator";
+import HotelsNavigator from "./HotelsNavigator";
 import type { SettingsStackParamList } from "./types";
 
 const Stack = createNativeStackNavigator<SettingsStackParamList>();
@@ -35,6 +36,7 @@ export default function SettingsNavigator() {
       />
 
       <Stack.Screen name="Vehicles" component={VehiclesNavigator} />
+      <Stack.Screen name="Hotels" component={HotelsNavigator} />
     </Stack.Navigator>
   );
 }

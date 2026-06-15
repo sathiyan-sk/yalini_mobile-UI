@@ -19,7 +19,6 @@ export type EmployeesStackParamList = {
 /**
  * Native-stack screens reachable from the Settings tab.
  * `Settings` is the entry point; `MyBusiness` mounts a full CRUD flow
- * (list → add → edit) and `Vehicles` mounts the Vehicles module stack.
  */
 export type SettingsStackParamList = {
   Settings: undefined;
@@ -27,4 +26,5 @@ export type SettingsStackParamList = {
   AddBusiness: undefined;
   EditBusiness: { businessId: string };
   Vehicles: undefined;
+  Hotels: undefined;
 };
