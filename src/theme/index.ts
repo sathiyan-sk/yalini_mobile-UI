@@ -25,6 +25,12 @@ export const colors = {
   warningSoft: "#FFEDD5",
   error: "#DC2626",
   info: "#2563EB",
+  
+    // Vehicle specific
+  running: "#34C759",
+  runningSoft: "#E8F8EC",
+  maintenance: "#FF9500",
+  maintenanceSoft: "#FFF5E6",
 
   // Borders
   border: "#E5E7EB",
