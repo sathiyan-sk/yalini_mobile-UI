@@ -28,4 +28,5 @@ export type SettingsStackParamList = {
   Vehicles: undefined;
   Hotels: undefined;
   AssignAssets: undefined;
+  AssignAsset: { employeeId?: string; assetType?: "vehicle" | "hotel" };
 };

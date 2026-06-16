@@ -32,17 +32,13 @@ import type { Employee } from "../Employees/types";
 import type { Vehicle } from "../../../types/vehicle";
 import type { Hotel } from "../Hotels/types";
 
+import { AssignmentStatsCards } from "./components/AllAssignmentStatsCards";
+import { AssignmentCard } from "./components/AllAssignmentCard";
+import { AssignmentSearchBar } from "./components/AllAssignmentSearchBar";
+import type { SettingsStackParamList } from "../../../navigation/types";
 import { AllAssignmentsHeader } from "./components/AllAssignmentsHeader";
-import { AssignmentStatsCards } from "./components/AssignmentStatsCards";
-import { AssignmentCard } from "./components/AssignmentCard";
-import { AssignmentSearchBar } from "./components/AssignmentSearchBar";
 
-type AllAssignmentsStackParamList = {
-  AllAssignments: undefined;
-  AssignAsset: undefined;
-};
-
-type Nav = NativeStackNavigationProp<AllAssignmentsStackParamList, "AllAssignments">;
+type Nav = NativeStackNavigationProp<SettingsStackParamList, "AssignAssets">;
 
 const TAB_BAR_CLEARANCE = 72;
 

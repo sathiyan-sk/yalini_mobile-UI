@@ -9,11 +9,13 @@
  * - Hotel: Shows water delivery employees and available hotels
  */
 import React, { useCallback, useState } from "react";
-import { ScrollView, StyleSheet, View } from "react-native";
+import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { useNavigation } from "@react-navigation/native";
+import type { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { Feather } from "@expo/vector-icons";
 
-import { colors, spacing } from "../../../theme";
+import { colors, spacing, tones, radius, fontSize, cardShadow } from "../../../theme";
 import { useEmployees } from "../../../hooks/useEmployees";
 import { useVehicles } from "../../../hooks/useVehicles";
 import { useHotels } from "../../../hooks/useHotels";
@@ -34,6 +36,7 @@ import type { AssetType } from "./types";
 import type { Employee } from "../Employees/types";
 import type { Vehicle } from "../../../types/vehicle";
 import type { Hotel } from "../Hotels/types";
+import type { SettingsStackParamList } from "../../../navigation/types";
 
 import { AssignmentHeader } from "./components/AssignmentHeader";
 import { AssetTypeSelector } from "./components/AssetTypeSelector";
@@ -42,12 +45,14 @@ import { EmployeeListSection } from "./components/EmployeeListSection";
 import { AssetSelectionSheet } from "./components/AssetSelectionSheet";
 import { ConfirmUnassignSheet } from "./components/ConfirmUnassignSheet";
 
+type Nav = NativeStackNavigationProp<SettingsStackParamList, "AssignAssets">;
+
 /** Reserve room for the floating bottom tab bar (matches DashboardScreen). */
 const TAB_BAR_CLEARANCE = 72;
 
 export default function AssignAssetScreen() {
   const insets = useSafeAreaInsets();
-  const navigation = useNavigation();
+  const navigation = useNavigation<Nav>();
 
   // Data hooks
   const { employees, loading: employeesLoading, refresh: refreshEmployees } = useEmployees();
@@ -183,7 +188,17 @@ export default function AssignAssetScreen() {
           paddingBottom: insets.bottom + TAB_BAR_CLEARANCE + spacing.lg,
         }}
       >
-
+        {/* View All Assignments banner */}
+        <TouchableOpacity
+          style={styles.viewAllBanner}
+          onPress={() => navigation.navigate("AssignAssets")}
+          activeOpacity={0.8}
+          testID="view-all-assignments-btn"
+        >
+          <Feather name="list" size={18} color={tones.purple.accent} />
+          <Text style={styles.viewAllText}>View All Assignments</Text>
+          <Feather name="chevron-right" size={18} color={tones.purple.accent} />
+        </TouchableOpacity>
         <AssignmentStatsCards
           employees={employees}
           vehicles={vehicles}
@@ -238,5 +253,24 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: colors.surfaceSecondary,
+  },
+  viewAllBanner: {
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: tones.purple.cardBg,
+    marginHorizontal: spacing.lg,
+    marginTop: spacing.lg,
+    paddingHorizontal: spacing.lg,
+    paddingVertical: spacing.md,
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: tones.purple.iconBg,
+    gap: spacing.sm,
+  },
+  viewAllText: {
+    flex: 1,
+    fontSize: fontSize.base,
+    fontWeight: "600",
+    color: tones.purple.accent,
   },
 });
