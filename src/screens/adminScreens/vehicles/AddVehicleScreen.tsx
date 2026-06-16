@@ -310,11 +310,11 @@ const styles = StyleSheet.create({
   },
   kbWrap: {
     flex: 1,
+    
   },
   formCard: {
     backgroundColor: colors.surface,
     marginHorizontal: spacing.lg,
-    marginTop: -spacing.lg,
     marginBottom: spacing.md,
     borderRadius: radius.lg,
     padding: spacing.lg,
