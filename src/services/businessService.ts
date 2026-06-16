@@ -77,7 +77,8 @@ export async function loadBusinesses(): Promise<Business[]> {
     // Migrate old 'water' type to 'water_delivery'
     const migrated = parsed.map(b => ({
       ...b,
-      type: b.type === 'water' ? 'water_delivery' : b.type
+      // migrate legacy 'water' type to 'water_delivery'
+      type: (b.type as unknown as string) === 'water' ? 'water_delivery' : b.type
     })) as Business[];
     return migrated;
   } catch {

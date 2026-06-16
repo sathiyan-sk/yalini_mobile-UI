@@ -1,4 +1,4 @@
-import type { SettingsSection } from "../types";
+import type { SettingsSection, SettingsRowDestination } from "../types";
 
 /**
  * Static blueprint of the Settings screen.
@@ -42,6 +42,13 @@ export const SETTINGS_SECTIONS: SettingsSection[] = [
         subtitle: "Add, view and manage hotels",
         icon: { name: "bed-outline", tone: "orange" },
         destination: "Hotels",
+      },
+      {
+        key: "assign-assets",
+        title: "Assign Assets",
+        subtitle: "Assign vehicles and hotels to employees",
+        icon: { name: "swap-horizontal-outline", tone: "teal" },
+        destination: "AssignAssets" as unknown as SettingsRowDestination,
       },
     ],
   },

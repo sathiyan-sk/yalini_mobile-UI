@@ -27,4 +27,5 @@ export type SettingsStackParamList = {
   EditBusiness: { businessId: string };
   Vehicles: undefined;
   Hotels: undefined;
+  AssignAssets: undefined;
 };

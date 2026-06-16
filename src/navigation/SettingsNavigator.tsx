@@ -7,6 +7,7 @@ import AddBusinessScreen from "../screens/adminScreens/MyBusiness/AddBusinessScr
 import EditBusinessScreen from "../screens/adminScreens/MyBusiness/EditBusinessScreen";
 import VehiclesNavigator from "./VehiclesNavigator";
 import HotelsNavigator from "./HotelsNavigator";
+import AssignAssetScreen from "../screens/adminScreens/AssignAssets/AssignAssetScreen";
 import type { SettingsStackParamList } from "./types";
 
 const Stack = createNativeStackNavigator<SettingsStackParamList>();
@@ -37,6 +38,11 @@ export default function SettingsNavigator() {
 
       <Stack.Screen name="Vehicles" component={VehiclesNavigator} />
       <Stack.Screen name="Hotels" component={HotelsNavigator} />
+        <Stack.Screen
+        name="AssignAssets"
+        component={AssignAssetScreen}
+        options={{ animation: "slide_from_right" }}
+      />
     </Stack.Navigator>
   );
 }

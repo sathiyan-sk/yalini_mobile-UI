@@ -117,7 +117,9 @@ export async function loadEmployees(): Promise<Employee[]> {
     // Migrate old 'water' type to 'water_delivery'
     const migrated = parsed.map(e => ({
       ...e,
-      businessType: e.businessType === 'water' ? 'water_delivery' : e.businessType
+      // Migrate old 'water' type to 'water_delivery'. Cast to string to avoid
+      // TypeScript mismatch with older stored values.
+      businessType: String(e.businessType) === 'water' ? 'water_delivery' : e.businessType
     })) as Employee[];
     return migrated;
   } catch {
