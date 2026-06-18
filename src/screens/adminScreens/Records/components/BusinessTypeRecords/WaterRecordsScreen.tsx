@@ -1,10 +1,11 @@
-import React, { useState, useMemo } from "react";
+import React, { useState, useEffect, useMemo, useCallback } from "react";
 import {
   ScrollView,
   StyleSheet,
   View,
   RefreshControl,
   Text,
+  ActivityIndicator,
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useNavigation } from "@react-navigation/native";
@@ -17,43 +18,111 @@ import { TabSwitcher } from "../common/TabSwitcher";
 import { DeliveryPersonCard } from "./WaterType/DeliveryPersonCard";
 
 import { colors, spacing, fontSize } from "../../../../../theme";
-import { getBusinesses, MockWaterDeliveryRecord } from "../../../../../services/mockData";
+import { getBusinessesForSelector, getWaterDeliveryRecords } from "../../../../../services/mockData";
+import type { MockWaterDeliveryRecord } from "../../../../../services/mockData/types";
 import type { RecordStatus } from "../../../../../types/waterRecords";
 import type { RecordsStackParamList } from "../../../../../types/navigation";
-import { getWaterDeliveryRecords } from "@/services/mockData/index";
 
 const TAB_BAR_CLEARANCE = 80;
 
 type NavigationProp = NativeStackNavigationProp<RecordsStackParamList>;
 
+interface BusinessSelectorItem {
+  id: string;
+  name: string;
+  type: 'taxi' | 'water';
+}
+
 export default function WaterRecords() {
   const insets = useSafeAreaInsets();
   const navigation = useNavigation<NavigationProp>();
   
-  // Filter to only show water businesses
-  const waterBusinesses = getBusinesses().filter(b => b.type === "water");
-  
-  const [selectedBusiness, setSelectedBusiness] = useState(waterBusinesses[0]);
-  const [selectedDate, setSelectedDate] = useState("2025-07-10"); // Match mock data date
-  const [activeTab, setActiveTab] = useState<RecordStatus>("submitted");
+  // State for async data
+  const [waterBusinesses, setWaterBusinesses] = useState<BusinessSelectorItem[]>([]);
+  const [allRecords, setAllRecords] = useState<MockWaterDeliveryRecord[]>([]);
+  const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
+  
+  // Filter state
+  // keep this as any|null to match the Business|null shape expected by BusinessSelector
+  const [selectedBusiness, setSelectedBusiness] = useState<any | null>(null);
+  const [selectedDate, setSelectedDate] = useState("2026-06-10"); // Match mock data date
+  const [activeTab, setActiveTab] = useState<RecordStatus>("submitted");
+
+  // Load data function
+  const loadData = useCallback(async (isRefresh = false) => {
+    try {
+      if (!isRefresh) {
+        setLoading(true);
+      }
+
+      const [businesses, records] = await Promise.all([
+        getBusinessesForSelector(),
+        getWaterDeliveryRecords(),
+      ]);
+
+      // Filter to only show water businesses
+      const waterBiz = businesses.filter(b => b.type === 'water');
+      setWaterBusinesses(waterBiz);
+      setAllRecords(records);
+      
+      // Set initial selected business if not set
+      if (!selectedBusiness && waterBiz.length > 0) {
+        setSelectedBusiness(waterBiz[0]);
+      }
+    } catch (error) {
+      console.error('Failed to load water records data:', error);
+    } finally {
+      setLoading(false);
+      setRefreshing(false);
+    }
+  }, [selectedBusiness]);
+
+  // Initial load
+  useEffect(() => {
+    loadData();
+  }, []);
 
   // Filter records based on tab
   const filteredRecords = useMemo(() => {
-    return getWaterDeliveryRecords().filter((record) => record.status === activeTab);
-  }, [activeTab]);
+    return allRecords.filter((record) => record.status === activeTab);
+  }, [allRecords, activeTab]);
 
-  const submittedCount = getWaterDeliveryRecords().filter((r) => r.status === "submitted").length;
-  const pendingCount = getWaterDeliveryRecords().filter((r) => r.status === "pending").length;
+  const submittedCount = useMemo(() => {
+    return allRecords.filter((r) => r.status === "submitted").length;
+  }, [allRecords]);
 
-  const handleRefresh = () => {
+  const pendingCount = useMemo(() => {
+    return allRecords.filter((r) => r.status === "pending").length;
+  }, [allRecords]);
+
+  const handleRefresh = useCallback(() => {
     setRefreshing(true);
-    setTimeout(() => setRefreshing(false), 1000);
-  };
+    loadData(true);
+  }, [loadData]);
 
   const handleRecordPress = (recordId: string) => {
     navigation.navigate("WaterRecordDetails", { recordId });
   };
+
+  // Loading state
+  if (loading) {
+    return (
+      <View style={styles.container}>
+        <ScreenHeader
+          title="Daily Records"
+          leftIcon="menu"
+          rightIcon="filter"
+          onLeftPress={() => {}}
+          onRightPress={() => {}}
+        />
+        <View style={styles.loadingContainer}>
+          <ActivityIndicator size="large" color={colors.brand} />
+          <Text style={styles.loadingText}>Loading records...</Text>
+        </View>
+      </View>
+    );
+  }
 
   return (
     <View style={styles.container}>
@@ -149,6 +218,16 @@ const styles = StyleSheet.create({
   },
   listContainer: {
     flex: 1,
+  },
+  loadingContainer: {
+    flex: 1,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  loadingText: {
+    fontSize: fontSize.base,
+    color: colors.textSecondary,
+    marginTop: spacing.md,
   },
   emptyState: {
     alignItems: "center",

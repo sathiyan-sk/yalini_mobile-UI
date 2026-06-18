@@ -1,10 +1,11 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import {
   ScrollView,
   StyleSheet,
   View,
   Text,
   Pressable,
+  ActivityIndicator,
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useNavigation, useRoute } from "@react-navigation/native";
@@ -19,6 +20,7 @@ import { FooterSummaryCard } from "./TaxiType/FooterSummaryCard";
 
 import { colors, spacing, fontSize, radius } from "../../../../../theme";
 import { getDriverRecordById } from "../../../../../services/mockData/index";
+import type { MockDriverRecord } from "../../../../../services/mockData/types";
 import type { RecordsStackParamList } from "../../../../../types/navigation";
 
 
@@ -33,11 +35,71 @@ export default function TaxiRecordDetailed() {
   const route = useRoute<ScreenRouteProp>();
   
   const { recordId } = route.params;
-  const record = getDriverRecordById(recordId);
+  
+  // State for async data loading
+  const [record, setRecord] = useState<MockDriverRecord | undefined>(undefined);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
+  // Fetch record data asynchronously
+  useEffect(() => {
+    let isMounted = true;
+    
+    const fetchRecord = async () => {
+      try {
+        setLoading(true);
+        setError(null);
+        const data = await getDriverRecordById(recordId);
+        if (isMounted) {
+          setRecord(data);
+        }
+      } catch (e) {
+        if (isMounted) {
+          setError(e instanceof Error ? e.message : 'Failed to load record');
+        }
+      } finally {
+        if (isMounted) {
+          setLoading(false);
+        }
+      }
+    };
+
+    fetchRecord();
+
+    return () => {
+      isMounted = false;
+    };
+  }, [recordId]);
+
+  // Loading state
+  if (loading) {
+    return (
+      <View style={[styles.container, styles.centerContainer]}>
+        <ActivityIndicator size="large" color={colors.brand} />
+        <Text style={styles.loadingText}>Loading record...</Text>
+      </View>
+    );
+  }
+
+  // Error state
+  if (error) {
+    return (
+      <View style={[styles.container, styles.centerContainer]}>
+        <Text style={styles.emptyText}>{error}</Text>
+        <Pressable 
+          style={styles.backButton}
+          onPress={() => navigation.goBack()}
+        >
+          <Text style={styles.backButtonText}>Go Back</Text>
+        </Pressable>
+      </View>
+    );
+  }
+
+  // Not found state
   if (!record) {
     return (
-      <View style={[styles.container, styles.emptyContainer]}>
+      <View style={[styles.container, styles.centerContainer]}>
         <Text style={styles.emptyText}>Record not found</Text>
         <Pressable 
           style={styles.backButton}
@@ -106,7 +168,7 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: colors.surfaceSecondary,
   },
-  emptyContainer: {
+  centerContainer: {
     alignItems: "center",
     justifyContent: "center",
   },
@@ -158,6 +220,11 @@ const styles = StyleSheet.create({
     marginBottom: spacing.md,
   },
   footerSection: {
+    marginTop: spacing.md,
+  },
+  loadingText: {
+    fontSize: fontSize.base,
+    color: colors.textSecondary,
     marginTop: spacing.md,
   },
   emptyText: {
