@@ -2,8 +2,8 @@ import React from "react";
 import { StyleSheet, Text, View } from "react-native";
 import { Feather, Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
 
-import { colors, fontSize, radius, spacing, lightShadow } from "../../../../../../../src/theme";
-import { formatCurrency } from "../../../../../../../src/utils/format";
+import { colors, fontSize, radius, spacing, lightShadow } from "../../../../../../theme";
+import { formatCurrency } from "../../../../../../utils/format";
 
 type WaterSummaryMetricType = 
   | "delivered" 

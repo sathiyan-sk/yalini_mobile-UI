@@ -14,7 +14,7 @@ import { ScreenHeader } from "../common/ScreenHeader";
 import { BusinessSelector } from "../common/BusinessSelector";
 import { DateSelector } from "../common/DateSelector";
 import { TabSwitcher } from "../common/TabSwitcher";
-import { DeliveryPersonCard } from "../dailyRecords/waterBusiness/DeliveryPersonCard";
+import { DeliveryPersonCard } from "./waterBusiness/DeliveryPersonCard";
 
 import { colors, spacing, fontSize } from "../../../../../theme";
 import { mockBusinesses, mockWaterDeliveryRecords } from "../../../../../data/mockWaterRecords";

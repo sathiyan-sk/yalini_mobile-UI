@@ -9,7 +9,7 @@ import {
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 
-import { cardShadow, colors, fontSize, radius, spacing } from "../../../../../../src/theme";
+import { cardShadow, colors, fontSize, radius, spacing } from "../../../../../theme";
 import type { Business } from "../../../../../types/waterRecords";
 
 interface BusinessSelectorProps {

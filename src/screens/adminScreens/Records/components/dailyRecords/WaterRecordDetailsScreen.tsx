@@ -12,9 +12,9 @@ import type { RouteProp } from "@react-navigation/native";
 import type { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { Feather } from "@expo/vector-icons";
 
-import { DeliveryPersonInfoHeader } from "../dailyRecords/waterBusiness/DeliveryPersonInfoHeader";
-import { WaterSummarySection } from "../dailyRecords/waterBusiness/WaterSummarySection";
-import { HotelDeliveryCard } from "../dailyRecords/waterBusiness/HotelDeliveryCard";
+import { DeliveryPersonInfoHeader } from "./waterBusiness/DeliveryPersonInfoHeader";
+import { WaterSummarySection } from "./waterBusiness/WaterSummarySection";
+import { HotelDeliveryCard } from "./waterBusiness/HotelDeliveryCard";
 
 import { colors, spacing, fontSize, radius } from "../../../../../theme";
 import { getMockWaterRecordById } from "../../../../../data/mockWaterRecords";

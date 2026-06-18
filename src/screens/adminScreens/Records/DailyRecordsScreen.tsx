@@ -10,10 +10,10 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useNavigation } from "@react-navigation/native";
 import type { NativeStackNavigationProp } from "@react-navigation/native-stack";
 
-import { ScreenHeader } from "../Record's/components/common/ScreenHeader";
-import { BusinessSelector } from "../Record's/components/common/BusinessSelector";
-import { DateSelector } from "../Record's/components/common/DateSelector";
-import { TabSwitcher } from "../Record's/components/common/TabSwitcher";
+import { ScreenHeader } from "./components/common/ScreenHeader";
+import { BusinessSelector } from "./components/common/BusinessSelector";
+import { DateSelector } from "./components/common/DateSelector";
+import { TabSwitcher } from "./components/common/TabSwitcher";
 import { DriverCard } from "./components/dailyRecords/taxiBusiness/DriverCard";
 import { DeliveryPersonCard } from "./components/dailyRecords/waterBusiness/DeliveryPersonCard";
 

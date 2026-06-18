@@ -1,9 +1,9 @@
 import React from "react";
 import { StyleSheet, Text, View } from "react-native";
 
-import { colors, fontSize, radius, spacing } from "../../../../../../../src/theme";
+import { colors, fontSize, radius, spacing } from "../../../../../../theme";
 import { WaterSummaryMetricCard } from "./WaterSummaryMetricCard";
-import type { WaterDeliveryRecord } from "../../../../../../../src/types/waterRecords";
+import type { WaterDeliveryRecord } from "../../../../../../types/waterRecords";
 
 interface WaterSummarySectionProps {
   record: WaterDeliveryRecord;

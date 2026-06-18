@@ -9,9 +9,9 @@ import Animated, {
   Extrapolation,
 } from "react-native-reanimated";
 
-import { colors, fontSize, radius, spacing, lightShadow, cardShadow } from "../../../../../../../src/theme";
-import { formatCurrency } from "../../../../../../../src/utils/format";
-import type { HotelDelivery } from "../../../../../../../src/types/waterRecords";
+import { colors, fontSize, radius, spacing, lightShadow, cardShadow } from "../../../../../../theme";
+import { formatCurrency } from "../../../../../../utils/format";
+import type { HotelDelivery } from "../../../../../../types/waterRecords";
 
 interface HotelDeliveryCardProps {
   hotel: HotelDelivery;

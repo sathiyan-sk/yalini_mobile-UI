@@ -1,8 +1,8 @@
 import React from "react";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 
-import WaterDailyRecordsScreen from "../screens/adminScreens/Record's/components/dailyRecords/WaterDailyRecordsScreen";
-import WaterRecordDetailsScreen from "../screens/adminScreens/Record's/components/dailyRecords/WaterRecordDetailsScreen";
+import WaterDailyRecordsScreen from "../screens/adminScreens/Records/components/dailyRecords/WaterDailyRecordsScreen";
+import WaterRecordDetailsScreen from "../screens/adminScreens/Records/components/dailyRecords/WaterRecordDetailsScreen";
 import type { WaterRecordsStackParamList } from "../types/navigation";
 
 const Stack = createNativeStackNavigator<WaterRecordsStackParamList>();

@@ -2,11 +2,11 @@ import React from "react";
 import { StyleSheet, Text, View } from "react-native";
 import { Feather, Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
 
-import { colors, fontSize, radius, spacing, cardShadow } from "../../../../../../../src/theme";
-import { formatDisplayDate, formatCurrency } from "../../../../../../../src/utils/format";
+import { colors, fontSize, radius, spacing, cardShadow } from "../../../../../../theme";
+import { formatDisplayDate, formatCurrency } from "../../../../../../utils/format";
 import { Avatar } from "../../common/Avatar";
 import { StatusBadge } from "../../common/StatusBadge";
-import type { WaterDeliveryRecord } from "../../../../../../../src/types/waterRecords";
+import type { WaterDeliveryRecord } from "../../../../../../types/waterRecords";
 
 interface DeliveryPersonInfoHeaderProps {
   record: WaterDeliveryRecord;
