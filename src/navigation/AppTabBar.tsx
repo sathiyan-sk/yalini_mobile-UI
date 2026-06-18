@@ -12,8 +12,7 @@ const TAB_CONFIG: Record<
   { label: string; icon: keyof typeof Feather.glyphMap }
 > = {
   Dashboard: { label: "Dashboard", icon: "home" },
-  DailyRecords: { label: "Taxi", icon: "truck" },
-  WaterRecords: { label: "Water", icon: "droplet" },
+  DailyRecords: { label: "Records", icon: "file-text" },
   Employees: { label: "Employees", icon: "users" },
   Settings: { label: "Settings", icon: "settings" },
 };

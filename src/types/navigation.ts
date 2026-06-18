@@ -5,9 +5,8 @@
 export type RootTabParamList = {
   Dashboard: undefined;
   DailyRecords: undefined;
+  Employees: undefined;
   Settings: undefined;
-  WaterRecords: undefined;
-  WaterRecordDetails: { recordId: string };
 };
 
 /**
@@ -17,6 +16,7 @@ export type RootTabParamList = {
 export type DailyRecordsStackParamList = {
   DailyRecordsList: undefined;
   RecordDetails: { recordId: string };
+  WaterRecordDetails: { recordId: string };
 };
 /**
  * Native-stack screens for the Water Records flow.

@@ -15,11 +15,15 @@ import { BusinessSelector } from "../Record's/components/common/BusinessSelector
 import { DateSelector } from "../Record's/components/common/DateSelector";
 import { TabSwitcher } from "../Record's/components/common/TabSwitcher";
 import { DriverCard } from "./components/dailyRecords/taxiBusiness/DriverCard";
+import { DeliveryPersonCard } from "./components/dailyRecords/waterBusiness/DeliveryPersonCard";
 
 import { colors, spacing, fontSize } from "../../../theme";
 import { mockBusinesses, mockDriverRecords } from "../../../data/mockDailyRecords";
+import { mockWaterDeliveryRecords } from "../../../data/mockWaterRecords";
 import type { RecordStatus } from "../../../types/taxiRecords";
+import type { RecordStatus as WaterRecordStatus } from "../../../types/waterRecords";
 import type { DailyRecordsStackParamList } from "../../../types/navigation";
+import type { Business } from "../../../types/waterRecords";
 
 const TAB_BAR_CLEARANCE = 80;
 
@@ -29,26 +33,65 @@ export default function DailyRecordsScreen() {
   const insets = useSafeAreaInsets();
   const navigation = useNavigation<NavigationProp>();
   
-  const [selectedBusiness, setSelectedBusiness] = useState(mockBusinesses[0]);
-  const [selectedDate, setSelectedDate] = useState("2026-06-10"); // Match mock data date
-  const [activeTab, setActiveTab] = useState<RecordStatus>("submitted");
+  // Use unified business list with type information
+  const allBusinesses: Business[] = mockBusinesses as Business[];
+  
+  const [selectedBusiness, setSelectedBusiness] = useState<Business>(allBusinesses[0]);
+  const [selectedDate, setSelectedDate] = useState("2026-06-10"); // Default date for taxi data
+  const [activeTab, setActiveTab] = useState<RecordStatus | WaterRecordStatus>("submitted");
   const [refreshing, setRefreshing] = useState(false);
 
-  // Filter records based on tab
-  const filteredRecords = useMemo(() => {
-    return mockDriverRecords.filter((record) => record.status === activeTab);
-  }, [activeTab]);
+  // Determine if current business is water type
+  const isWaterBusiness = selectedBusiness?.type === "water";
 
-  const submittedCount = mockDriverRecords.filter((r) => r.status === "submitted").length;
-  const pendingCount = mockDriverRecords.filter((r) => r.status === "pending").length;
+  // Handle business selection change
+  const handleBusinessChange = (business: Business) => {
+    setSelectedBusiness(business);
+    // Update default date based on business type
+    if (business.type === "water") {
+      setSelectedDate("2025-07-10"); // Date for water mock data
+    } else {
+      setSelectedDate("2026-06-10"); // Date for taxi mock data
+    }
+    // Reset to submitted tab
+    setActiveTab("submitted");
+  };
+
+  // Filter records based on tab and business type
+  const filteredRecords = useMemo(() => {
+    if (isWaterBusiness) {
+      return mockWaterDeliveryRecords.filter((record) => record.status === activeTab);
+    }
+    return mockDriverRecords.filter((record) => record.status === activeTab);
+  }, [activeTab, isWaterBusiness]);
+
+  // Calculate counts based on business type
+  const submittedCount = useMemo(() => {
+    if (isWaterBusiness) {
+      return mockWaterDeliveryRecords.filter((r) => r.status === "submitted").length;
+    }
+    return mockDriverRecords.filter((r) => r.status === "submitted").length;
+  }, [isWaterBusiness]);
+
+  const pendingCount = useMemo(() => {
+    if (isWaterBusiness) {
+      return mockWaterDeliveryRecords.filter((r) => r.status === "pending").length;
+    }
+    return mockDriverRecords.filter((r) => r.status === "pending").length;
+  }, [isWaterBusiness]);
 
   const handleRefresh = () => {
     setRefreshing(true);
     setTimeout(() => setRefreshing(false), 1000);
   };
 
+  // Handle record press based on business type
   const handleRecordPress = (recordId: string) => {
-    navigation.navigate("RecordDetails", { recordId });
+    if (isWaterBusiness) {
+      navigation.navigate("WaterRecordDetails", { recordId });
+    } else {
+      navigation.navigate("RecordDetails", { recordId });
+    }
   };
 
   return (
@@ -79,9 +122,9 @@ export default function DailyRecordsScreen() {
         {/* Selectors Row */}
         <View style={styles.selectorsRow}>
           <BusinessSelector
-            businesses={mockBusinesses}
+            businesses={allBusinesses}
             selectedBusiness={selectedBusiness}
-            onSelect={setSelectedBusiness}
+            onSelect={handleBusinessChange}
           />
           <View style={styles.selectorGap} />
           <DateSelector 
@@ -100,16 +143,28 @@ export default function DailyRecordsScreen() {
           />
         </View>
 
-        {/* Records List */}
+        {/* Records List - Conditionally render based on business type */}
         <View style={styles.listContainer}>
           {filteredRecords.length > 0 ? (
-            filteredRecords.map((record) => (
-              <DriverCard
-                key={record.id}
-                record={record}
-                onPress={() => handleRecordPress(record.id)}
-              />
-            ))
+            isWaterBusiness ? (
+              // Render Water Delivery Records
+              filteredRecords.map((record: any) => (
+                <DeliveryPersonCard
+                  key={record.id}
+                  record={record}
+                  onPress={() => handleRecordPress(record.id)}
+                />
+              ))
+            ) : (
+              // Render Taxi Driver Records
+              filteredRecords.map((record: any) => (
+                <DriverCard
+                  key={record.id}
+                  record={record}
+                  onPress={() => handleRecordPress(record.id)}
+                />
+              ))
+            )
           ) : (
             <View style={styles.emptyState}>
               <Text style={styles.emptyText}>No records found</Text>

@@ -12,7 +12,6 @@ import DashboardScreen from "../screens/adminScreens/Dashboard/DashboardScreen";
 import EmployeesNavigator from "./EmployeesNavigator";
 import SettingsNavigator from "./SettingsNavigator";
 import DailyRecordsNavigator from "./DailyRecordsNavigator";
-import WaterRecordsNavigator from "./WaterRecordsNavigator";
 
 const Tab = createBottomTabNavigator<RootTabParamList>();
 
@@ -40,7 +39,6 @@ export default function RootNavigator() {
 
           <Tab.Screen name="Dashboard" component={DashboardScreen} />
           <Tab.Screen name="DailyRecords" component={DailyRecordsNavigator} />
-          <Tab.Screen name="WaterRecords" component={WaterRecordsNavigator} />
           <Tab.Screen name="Employees" component={EmployeesNavigator} />
           <Tab.Screen name="Settings" component={SettingsNavigator} />
           

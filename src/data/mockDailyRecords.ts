@@ -4,6 +4,7 @@
  */
 
 import type { Business, DriverRecord, TripDetail } from "../types/taxiRecords";
+import type { Business as WaterBusiness } from "../types/waterRecords";
 import { colors } from "../theme";
 
 const AVATAR_COLORS = [
@@ -14,9 +15,9 @@ const AVATAR_COLORS = [
   colors.avatarVividPurple,
 ];
 
-export const mockBusinesses: Business[] = [
-  { id: "biz-1", name: "City Taxi" },
-  { id: "biz-2", name: "Yalini Minerals" },
+export const mockBusinesses: (Business | WaterBusiness)[] = [
+  { id: "bus-1", name: "Yalini Cab's", type: "taxi" },
+  { id: "bus-2", name: "Yalini Mineral's", type: "water" },
 ];
 
 const createTrips = (count: number, baseIncome: number, baseExpense: number): TripDetail[] => {

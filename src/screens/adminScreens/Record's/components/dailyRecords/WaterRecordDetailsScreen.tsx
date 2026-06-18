@@ -18,12 +18,12 @@ import { HotelDeliveryCard } from "../dailyRecords/waterBusiness/HotelDeliveryCa
 
 import { colors, spacing, fontSize, radius } from "../../../../../theme";
 import { getMockWaterRecordById } from "../../../../../data/mockWaterRecords";
-import type { WaterRecordsStackParamList } from "../../../../../types/navigation";
+import type { DailyRecordsStackParamList } from "../../../../../types/navigation";
 
 const TAB_BAR_CLEARANCE = 80;
 
-type ScreenRouteProp = RouteProp<WaterRecordsStackParamList, "WaterRecordDetails">;
-type NavigationProp = NativeStackNavigationProp<WaterRecordsStackParamList>;
+type ScreenRouteProp = RouteProp<DailyRecordsStackParamList, "WaterRecordDetails">;
+type NavigationProp = NativeStackNavigationProp<DailyRecordsStackParamList>;
 
 export default function WaterRecordDetailsScreen() {
   const insets = useSafeAreaInsets();

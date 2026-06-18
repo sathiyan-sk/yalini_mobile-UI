@@ -3,6 +3,7 @@ import { createNativeStackNavigator } from "@react-navigation/native-stack";
 
 import DailyRecordsScreen from "../screens/adminScreens/Record's/DailyRecordsScreen";
 import RecordDetailsScreen from "../screens/adminScreens/Record's/RecordDetailsScreen";
+import WaterRecordDetailsScreen from "../screens/adminScreens/Record's/components/dailyRecords/WaterRecordDetailsScreen";
 import type { DailyRecordsStackParamList } from "../types/navigation";
 
 const Stack = createNativeStackNavigator<DailyRecordsStackParamList>();
@@ -15,11 +16,11 @@ export default function DailyRecordsNavigator() {
   return (
     <Stack.Navigator
       screenOptions={{
-        headerShown: false,
-      }}
-    >
+        headerShown: false,}}
+      >
       <Stack.Screen name="DailyRecordsList" component={DailyRecordsScreen} />
       <Stack.Screen name="RecordDetails" component={RecordDetailsScreen} />
+      <Stack.Screen name="WaterRecordDetails" component={WaterRecordDetailsScreen} />
     </Stack.Navigator>
   );
 }

@@ -33,6 +33,7 @@ export interface TripDetail {
 export interface Business {
   id: string;
   name: string;
+  type: "taxi" | "water";
 }
 
 export interface DailyRecordsData {
