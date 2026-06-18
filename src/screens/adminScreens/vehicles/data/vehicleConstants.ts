@@ -1,6 +1,6 @@
 import type { Ionicons } from "@expo/vector-icons";
-import type { ToneKey } from "../theme";
-import type { VehicleStatusId } from "../types/vehicle";
+import type { ToneKey } from "../../../../theme";
+import type { VehicleStatusId } from "../../../../types/vehicle";
 
 /**
  * Static metadata that drives the Vehicle form and list displays.

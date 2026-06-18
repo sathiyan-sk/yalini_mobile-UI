@@ -3,7 +3,7 @@ import { Pressable, StyleSheet, Text, View } from "react-native";
 import { Feather } from "@expo/vector-icons";
 
 import { fontSize, spacing } from "../../../../theme";
-import { FORM_HEADER_BG } from "../../../../data/vehicleConstants";
+import { FORM_HEADER_BG } from "../data/vehicleConstants";
 
 interface FormHeaderProps {
   title: string;

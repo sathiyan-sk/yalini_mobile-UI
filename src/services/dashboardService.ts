@@ -1,27 +1,127 @@
-import { getMockDashboardData } from "../../src/data/mockDashboard";
-import type { DashboardData } from "../../src/types/dashboard";
-import { todayISO } from "../utils/format";
-
 /**
- * Dashboard data service.
+ * Dashboard data service — Mock Service Layer implementation.
  *
- * Currently backed by mock data. To wire the real backend, replace the body
- * of fetchDashboardData with a fetch call, e.g.:
- *
- *   const res = await fetch(
- *     `${process.env.EXPO_PUBLIC_BACKEND_URL}/api/dashboard?date=${isoDate}`,
- *   );
- *   if (!res.ok) throw new Error("Failed to load dashboard");
- *   return (await res.json()) as DashboardData;
- *
- * The DashboardData contract (src/types/dashboard.ts) stays the same.
+ * Currently backed by the mock data store. To wire the real backend, replace
+ * with a fetch call to the API endpoint.
  */
 
-const MOCK_LATENCY_MS = 450;
+import {
+  getBusinesses,
+  getEmployees,
+  getDriverRecords,
+  getWaterDeliveryRecords,
+} from '../services/mockData';
+import type { DashboardData, BusinessOverview, Submission } from '../types/dashboard';
 
-export async function fetchDashboardData(
-  isoDate: string,
-): Promise<DashboardData> {
-  await new Promise((resolve) => setTimeout(resolve, MOCK_LATENCY_MS));
-  return getMockDashboardData(isoDate, isoDate === todayISO());
+const MOCK_LATENCY_MS = 200;
+
+/**
+ * Generate dashboard data from the mock store.
+ * This provides real-time data based on the current state of the store.
+ */
+export async function fetchDashboardData(isoDate: string): Promise<DashboardData> {
+  await new Promise(resolve => setTimeout(resolve, MOCK_LATENCY_MS));
+
+  const [businesses, employees, driverRecords, waterRecords] = await Promise.all([
+    getBusinesses(),
+    getEmployees(),
+    getDriverRecords(),
+    getWaterDeliveryRecords(),
+  ]);
+
+  // Calculate stats
+  const activeEmployees = employees.filter(e => e.status === 'enabled').length;
+  const enabledBusinesses = businesses.filter(b => b.status === 'enabled').length;
+
+  // Filter records for the selected date
+  const dateDriverRecords = driverRecords.filter(r => r.date === isoDate);
+  const dateWaterRecords = waterRecords.filter(r => r.date === isoDate);
+  const allRecords = [...dateDriverRecords, ...dateWaterRecords];
+
+  const submittedToday = allRecords.filter(r => r.status === 'submitted').length;
+  const pendingToday = allRecords.filter(r => r.status === 'pending').length;
+
+  // Build business overviews
+  const businessOverviews: BusinessOverview[] = [];
+
+  // Taxi business overview
+  const taxiBusiness = businesses.find(b => b.type === 'taxi');
+  if (taxiBusiness) {
+    const taxiTotalIncome = dateDriverRecords.reduce((sum, r) => sum + r.totalIncome, 0);
+    const taxiTotalExpense = dateDriverRecords.reduce((sum, r) => sum + r.totalExpense, 0);
+    const taxiNetProfit = taxiTotalIncome - taxiTotalExpense;
+
+    businessOverviews.push({
+      id: taxiBusiness.id,
+      name: taxiBusiness.name,
+      category: 'Taxi',
+      tone: 'purple',
+      icon: { family: 'ion', name: 'car-outline' },
+      metrics: [
+        { label: 'Total Income', amount: taxiTotalIncome, color: 'info' },
+        { label: "Total Expense's", amount: taxiTotalExpense, color: 'error' },
+        { label: 'Net Profit', amount: taxiNetProfit, color: 'success' },
+      ],
+    });
+  }
+
+  // Water business overview
+  const waterBusiness = businesses.find(b => b.type === 'water_delivery');
+  if (waterBusiness) {
+    const waterTotalIncome = dateWaterRecords.reduce((sum, r) => sum + r.totalIncome, 0);
+    const waterTotalExpense = dateWaterRecords.reduce((sum, r) => sum + r.totalExpense, 0);
+    const waterNetProfit = waterTotalIncome - waterTotalExpense;
+
+    businessOverviews.push({
+      id: waterBusiness.id,
+      name: waterBusiness.name,
+      category: 'Delivery',
+      tone: 'blue',
+      icon: { family: 'feather', name: 'droplet' },
+      metrics: [
+        { label: 'Total Income', amount: waterTotalIncome, color: 'info' },
+        { label: "Total Expense's", amount: waterTotalExpense, color: 'error' },
+        { label: 'Net Profit', amount: waterNetProfit, color: 'success' },
+      ],
+    });
+  }
+
+  // Build submissions list
+  const AVATAR_COLORS = ['#7C3AED', '#2563EB', '#059669', '#F97316', '#EC4899'];
+  const submissions: Submission[] = [];
+
+  dateDriverRecords.forEach((record, index) => {
+    submissions.push({
+      id: record.id,
+      employeeName: record.driverName,
+      businessName: taxiBusiness?.name || 'City Taxi',
+      date: record.date,
+      time: `${8 + index}:${String(Math.floor(Math.random() * 60)).padStart(2, '0')} PM`,
+      status: record.status,
+      avatarColor: AVATAR_COLORS[index % AVATAR_COLORS.length],
+    });
+  });
+
+  dateWaterRecords.forEach((record, index) => {
+    submissions.push({
+      id: record.id,
+      employeeName: record.deliveryPersonName,
+      businessName: waterBusiness?.name || 'Yalini Minerals',
+      date: record.date,
+      time: `${8 + index}:${String(Math.floor(Math.random() * 60)).padStart(2, '0')} PM`,
+      status: record.status,
+      avatarColor: AVATAR_COLORS[(index + 3) % AVATAR_COLORS.length],
+    });
+  });
+
+  return {
+    stats: {
+      activeEmployees,
+      submittedToday,
+      pendingToday,
+      businesses: enabledBusinesses,
+    },
+    businesses: businessOverviews,
+    submissions,
+  };
 }

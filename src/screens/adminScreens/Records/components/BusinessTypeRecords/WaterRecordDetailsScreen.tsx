@@ -17,7 +17,7 @@ import { WaterSummarySection } from "./WaterType/WaterSummarySection";
 import { HotelDeliveryCard } from "./WaterType/HotelDeliveryCard";
 
 import { colors, spacing, fontSize, radius } from "../../../../../theme";
-import { getMockWaterRecordById } from "../../../../../data/mockWaterRecords";
+import { getWaterDeliveryRecordById } from "../../../../../services/mockData/index";
 import type { RecordsStackParamList } from "../../../../../types/navigation";
 
 const TAB_BAR_CLEARANCE = 80;
@@ -31,7 +31,7 @@ export default function WaterRecordDetailsScreen() {
   const route = useRoute<ScreenRouteProp>();
   
   const { recordId } = route.params;
-  const record = getMockWaterRecordById(recordId);
+  const record = getWaterDeliveryRecordById(recordId);
 
   if (!record) {
     return (

@@ -18,7 +18,7 @@ import { TripCard } from "./TaxiType/TripCard";
 import { FooterSummaryCard } from "./TaxiType/FooterSummaryCard";
 
 import { colors, spacing, fontSize, radius } from "../../../../../theme";
-import { getMockRecordById } from "../../../../../data/mockDailyRecords";
+import { getDriverRecordById } from "../../../../../services/mockData/index";
 import type { RecordsStackParamList } from "../../../../../types/navigation";
 
 
@@ -33,7 +33,7 @@ export default function TaxiRecordDetailed() {
   const route = useRoute<ScreenRouteProp>();
   
   const { recordId } = route.params;
-  const record = getMockRecordById(recordId);
+  const record = getDriverRecordById(recordId);
 
   if (!record) {
     return (

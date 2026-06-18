@@ -1,10 +1,11 @@
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useEffect } from "react";
 import {
   ScrollView,
   StyleSheet,
   View,
   RefreshControl,
   Text,
+  ActivityIndicator,
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useNavigation } from "@react-navigation/native";
@@ -18,8 +19,7 @@ import { DriverCard } from "./components/BusinessTypeRecords/TaxiType/DriverCard
 import { DeliveryPersonCard } from "./components/BusinessTypeRecords/WaterType/DeliveryPersonCard";
 
 import { colors, spacing, fontSize } from "../../../theme";
-import { mockBusinesses, mockDriverRecords } from "../../../data/mockDailyRecords";
-import { mockWaterDeliveryRecords } from "../../../data/mockWaterRecords";
+import { useRecords } from "../../../hooks/useRecords";
 import type { RecordStatus } from "../../../types/taxiRecords";
 import type { RecordStatus as WaterRecordStatus } from "../../../types/waterRecords";
 import type { RecordsStackParamList } from "../../../types/navigation";
@@ -33,13 +33,20 @@ export default function RecordsHomeScreen() {
   const insets = useSafeAreaInsets();
   const navigation = useNavigation<NavigationProp>();
   
-  // Use unified business list with type information
-  const allBusinesses: Business[] = mockBusinesses as Business[];
+  // Use the new records hook that connects to the mock service layer
+  const { businesses, driverRecords, waterRecords, loading, refresh } = useRecords();
   
-  const [selectedBusiness, setSelectedBusiness] = useState<Business>(allBusinesses[0]);
-  const [selectedDate, setSelectedDate] = useState("2026-06-10"); // Default date for taxi data
+  const [selectedBusiness, setSelectedBusiness] = useState<Business | null>(null);
+  const [selectedDate, setSelectedDate] = useState("2026-06-10");
   const [activeTab, setActiveTab] = useState<RecordStatus | WaterRecordStatus>("submitted");
   const [refreshing, setRefreshing] = useState(false);
+
+  // Set initial selected business when businesses load
+  useEffect(() => {
+    if (businesses.length > 0 && !selectedBusiness) {
+      setSelectedBusiness(businesses[0] as Business);
+    }
+  }, [businesses, selectedBusiness]);
 
   // Determine if current business is water type
   const isWaterBusiness = selectedBusiness?.type === "water";
@@ -47,45 +54,52 @@ export default function RecordsHomeScreen() {
   // Handle business selection change
   const handleBusinessChange = (business: Business) => {
     setSelectedBusiness(business);
-    // Update default date based on business type
-    if (business.type === "water") {
-      setSelectedDate("2025-07-10"); // Date for water mock data
-    } else {
-      setSelectedDate("2026-06-10"); // Date for taxi mock data
-    }
     // Reset to submitted tab
     setActiveTab("submitted");
   };
 
-  // Filter records based on tab and business type
+  // Filter records based on tab, business type, and date
   const filteredRecords = useMemo(() => {
     if (isWaterBusiness) {
-      return mockWaterDeliveryRecords.filter((record) => record.status === activeTab);
+      return waterRecords.filter(
+        (record) => record.status === activeTab && record.date === selectedDate
+      );
     }
-    return mockDriverRecords.filter((record) => record.status === activeTab);
-  }, [activeTab, isWaterBusiness]);
+    return driverRecords.filter(
+      (record) => record.status === activeTab && record.date === selectedDate
+    );
+  }, [activeTab, isWaterBusiness, driverRecords, waterRecords, selectedDate]);
 
-  // Calculate counts based on business type
+  // Calculate counts based on business type and date
   const submittedCount = useMemo(() => {
     if (isWaterBusiness) {
-      return mockWaterDeliveryRecords.filter((r) => r.status === "submitted").length;
+      return waterRecords.filter(
+        (r) => r.status === "submitted" && r.date === selectedDate
+      ).length;
     }
-    return mockDriverRecords.filter((r) => r.status === "submitted").length;
-  }, [isWaterBusiness]);
+    return driverRecords.filter(
+      (r) => r.status === "submitted" && r.date === selectedDate
+    ).length;
+  }, [isWaterBusiness, driverRecords, waterRecords, selectedDate]);
 
   const pendingCount = useMemo(() => {
     if (isWaterBusiness) {
-      return mockWaterDeliveryRecords.filter((r) => r.status === "pending").length;
+      return waterRecords.filter(
+        (r) => r.status === "pending" && r.date === selectedDate
+      ).length;
     }
-    return mockDriverRecords.filter((r) => r.status === "pending").length;
-  }, [isWaterBusiness]);
+    return driverRecords.filter(
+      (r) => r.status === "pending" && r.date === selectedDate
+    ).length;
+  }, [isWaterBusiness, driverRecords, waterRecords, selectedDate]);
 
-  const handleRefresh = () => {
+  const handleRefresh = async () => {
     setRefreshing(true);
-    setTimeout(() => setRefreshing(false), 1000);
+    await refresh();
+    setRefreshing(false);
   };
 
-  // Handle record press based on business type - FIXED NAVIGATION
+  // Handle record press based on business type
   const handleRecordPress = (recordId: string) => {
     if (isWaterBusiness) {
       navigation.navigate("WaterRecordDetails", { recordId });
@@ -93,6 +107,16 @@ export default function RecordsHomeScreen() {
       navigation.navigate("TaxiRecordDetails", { recordId });
     }
   };
+
+  // Show loading state
+  if (loading && !refreshing) {
+    return (
+      <View style={[styles.container, styles.loadingContainer]}>
+        <ActivityIndicator size="large" color={colors.brand} />
+        <Text style={styles.loadingText}>Loading records...</Text>
+      </View>
+    );
+  }
 
   return (
     <View style={styles.container}>
@@ -122,7 +146,7 @@ export default function RecordsHomeScreen() {
         {/* Selectors Row */}
         <View style={styles.selectorsRow}>
           <BusinessSelector
-            businesses={allBusinesses}
+            businesses={businesses as Business[]}
             selectedBusiness={selectedBusiness}
             onSelect={handleBusinessChange}
           />
@@ -168,6 +192,11 @@ export default function RecordsHomeScreen() {
           ) : (
             <View style={styles.emptyState}>
               <Text style={styles.emptyText}>No records found</Text>
+              <Text style={styles.emptySubtext}>
+                {selectedDate === "2026-06-10" 
+                  ? "Records are available for this date"
+                  : "Try selecting a different date"}
+              </Text>
             </View>
           )}
         </View>
@@ -180,6 +209,15 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: colors.surfaceSecondary,
+  },
+  loadingContainer: {
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  loadingText: {
+    marginTop: spacing.md,
+    fontSize: fontSize.base,
+    color: colors.textSecondary,
   },
   scrollView: {
     flex: 1,
@@ -209,5 +247,11 @@ const styles = StyleSheet.create({
   emptyText: {
     fontSize: fontSize.lg,
     color: colors.textSecondary,
+    fontWeight: "600",
+  },
+  emptySubtext: {
+    fontSize: fontSize.base,
+    color: colors.textTertiary,
+    marginTop: spacing.xs,
   },
 });

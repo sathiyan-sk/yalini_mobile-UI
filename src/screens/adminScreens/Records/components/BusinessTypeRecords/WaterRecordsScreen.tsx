@@ -17,9 +17,10 @@ import { TabSwitcher } from "../common/TabSwitcher";
 import { DeliveryPersonCard } from "./WaterType/DeliveryPersonCard";
 
 import { colors, spacing, fontSize } from "../../../../../theme";
-import { mockBusinesses, mockWaterDeliveryRecords } from "../../../../../data/mockWaterRecords";
+import { getBusinesses, MockWaterDeliveryRecord } from "../../../../../services/mockData";
 import type { RecordStatus } from "../../../../../types/waterRecords";
 import type { RecordsStackParamList } from "../../../../../types/navigation";
+import { getWaterDeliveryRecords } from "@/services/mockData/index";
 
 const TAB_BAR_CLEARANCE = 80;
 
@@ -30,7 +31,7 @@ export default function WaterRecords() {
   const navigation = useNavigation<NavigationProp>();
   
   // Filter to only show water businesses
-  const waterBusinesses = mockBusinesses.filter(b => b.type === "water");
+  const waterBusinesses = getBusinesses().filter(b => b.type === "water");
   
   const [selectedBusiness, setSelectedBusiness] = useState(waterBusinesses[0]);
   const [selectedDate, setSelectedDate] = useState("2025-07-10"); // Match mock data date
@@ -39,11 +40,11 @@ export default function WaterRecords() {
 
   // Filter records based on tab
   const filteredRecords = useMemo(() => {
-    return mockWaterDeliveryRecords.filter((record) => record.status === activeTab);
+    return getWaterDeliveryRecords().filter((record) => record.status === activeTab);
   }, [activeTab]);
 
-  const submittedCount = mockWaterDeliveryRecords.filter((r) => r.status === "submitted").length;
-  const pendingCount = mockWaterDeliveryRecords.filter((r) => r.status === "pending").length;
+  const submittedCount = getWaterDeliveryRecords().filter((r) => r.status === "submitted").length;
+  const pendingCount = getWaterDeliveryRecords().filter((r) => r.status === "pending").length;
 
   const handleRefresh = () => {
     setRefreshing(true);

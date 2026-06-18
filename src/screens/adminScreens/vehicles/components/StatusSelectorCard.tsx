@@ -4,7 +4,7 @@ import { Ionicons } from "@expo/vector-icons";
 
 import { colors, fontSize, radius, spacing, tones } from "../../../../theme";
 import type { VehicleStatusId } from "../../../../types/vehicle";
-import { VEHICLE_STATUS_OPTIONS } from "../../../../data/vehicleConstants";
+import { VEHICLE_STATUS_OPTIONS } from "../data/vehicleConstants";
 
 interface StatusSelectorCardProps {
   statusId: VehicleStatusId;
