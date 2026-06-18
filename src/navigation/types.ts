@@ -1,9 +1,26 @@
 export type RootTabParamList = {
   Dashboard: undefined;
   DailyRecords: undefined;
-  Finance: undefined;
+  WaterRecords: undefined;
   Employees: undefined;
   SettingsHome: undefined;
+};
+
+/**
+ * Native-stack screens for the DailyRecords tab.
+ * DailyRecordsList is the entry point; RecordDetails shows individual record.
+ */
+export type DailyRecordsStackParamList = {
+  DailyRecordsList: undefined;
+  RecordDetails: { recordId: string };
+};
+
+/**
+ * Native-stack screens for the Water Records flow.
+ */
+export type WaterRecordsStackParamList = {
+  WaterRecordsList: undefined;
+  WaterRecordDetails: { recordId: string };
 };
 
 /**
