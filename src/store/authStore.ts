@@ -17,7 +17,7 @@ import { create } from "zustand";
 
 import { login as loginService, logout as logoutService } from "../services/authService";
 import type { AuthSession, AuthUser, LoginPayload, Role } from "../types/auth";
-import { storage } from "../../src/utils/storage";
+import { storage } from "../utils/storage";
 
 type Status = "booting" | "authenticated" | "unauthenticated";
 
