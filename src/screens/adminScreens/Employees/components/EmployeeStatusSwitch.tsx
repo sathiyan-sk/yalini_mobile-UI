@@ -19,7 +19,7 @@ export function EmployeeStatusSwitch({
   onChange,
   testID,
 }: EmployeeStatusSwitchProps) {
-  const isActive = value === "active";
+  const isEnabled = value === "enabled";
 
   return (
     <View style={styles.container} testID={testID}>
@@ -34,10 +34,10 @@ export function EmployeeStatusSwitch({
         <Text style={styles.label}>Enable Employee Login</Text>
         <Switch
           testID={`${testID ?? "status"}-switch`}
-          value={isActive}
-          onValueChange={(next) => onChange(next ? "active" : "disabled")}
+          value={isEnabled}
+          onValueChange={(next) => onChange(next ? "enabled" : "disabled")}
           trackColor={{ false: "#D1D5DB", true: "#818CF8" }}
-          thumbColor={isActive ? "#4F46E5" : "#F3F4F6"}
+          thumbColor={isEnabled ? "#4F46E5" : "#F3F4F6"}
           ios_backgroundColor="#D1D5DB"
         />
       </View>

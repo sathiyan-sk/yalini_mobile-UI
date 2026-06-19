@@ -61,7 +61,7 @@ export default function EditEmployeeScreen() {
     [employees, employeeId],
   );
 
-  const activeBusinesses = businesses.filter((b) => b.status === "active");
+  const activeBusinesses = businesses.filter((b) => b.status === "enabled");
 
   const [values, setValues] = useState<EmployeeFormValues | null>(null);
   const [errors, setErrors] = useState<FormErrors>({});

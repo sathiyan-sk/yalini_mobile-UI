@@ -43,7 +43,7 @@ const INITIAL_VALUES: EmployeeFormValues = {
   businessId: "",
   pin: "",
   confirmPin: "",
-  status: "active",
+  status: "enabled",
 };
 
 /**
@@ -61,7 +61,7 @@ export default function AddEmployeeScreen() {
   const { addEmployee } = useEmployees();
   const { businesses } = useBusinesses();
 
-  const activeBusinesses = businesses.filter((b) => b.status === "active");
+  const activeBusinesses = businesses.filter((b) => b.status === "enabled");
 
   const [values, setValues] = useState<EmployeeFormValues>(INITIAL_VALUES);
   const [errors, setErrors] = useState<FormErrors>({});

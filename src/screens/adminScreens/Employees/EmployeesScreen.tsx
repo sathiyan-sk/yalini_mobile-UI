@@ -61,11 +61,11 @@ export default function EmployeesScreen() {
   }, [employees, query, businessFilter]);
 
   const counts = useMemo(() => {
-    const active = employees.filter((e) => e.status === "active").length;
+    const enabled = employees.filter((e) => e.status === "enabled").length;
     return {
       total: employees.length,
-      active,
-      disabled: employees.length - active,
+      active: enabled,
+      disabled: employees.length - enabled,
     };
   }, [employees]);
 

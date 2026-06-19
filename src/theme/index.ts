@@ -33,6 +33,12 @@ export const colors = {
   errorSoft: "#FFEBEE",
   info: "#1E88E5",
   infoSoft: "#E3F2FD",
+    
+  // Vehicle Status Colors
+  running: "#22C55E",
+  runningSoft: "#DCFCE7",
+  maintenance: "#F59E0B",
+  maintenanceSoft: "#FEF3C7",
 
   // Tab colors
   tabActive: "#4527A0",

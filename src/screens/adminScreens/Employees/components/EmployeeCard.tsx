@@ -53,8 +53,8 @@ export function EmployeeCard({
 }: EmployeeCardProps) {
   const initials = getInitials(employee.fullName);
   const avatarColor = getAvatarColor(employee.fullName);
-  const statusColor = employee.status === "active" ? colors.success : colors.textTertiary;
-  const statusLabel = employee.status === "active" ? "Active" : "Disabled";
+  const statusColor = employee.status === "enabled" ? colors.success : colors.textTertiary;
+  const statusLabel = employee.status === "enabled" ? "Enabled" : "Disabled";
   const businessIcon = employee.businessType === "taxi" ? "car-sport" : "water";
   const businessIconColor = employee.businessType === "taxi" ? tones.orange.accent : tones.blue.accent;
 

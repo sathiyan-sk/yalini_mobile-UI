@@ -9,7 +9,7 @@ import VehiclesNavigator from "./VehiclesNavigator";
 import HotelsNavigator from "./HotelsNavigator";
 import AllAssignmentsScreen from "../screens/adminScreens/AssignAssets/AllAssignmentsScreen";
 import AssignAssetScreen from "../screens/adminScreens/AssignAssets/AssignAssetScreen";
-import type { SettingsStackParamList } from "./types";
+import type { SettingsStackParamList } from "../types/navigation";
 
 const Stack = createNativeStackNavigator<SettingsStackParamList>();
 

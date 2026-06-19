@@ -4,7 +4,7 @@ import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import EmployeesScreen from "../screens/adminScreens/Employees/EmployeesScreen";
 import AddEmployeeScreen from "../screens/adminScreens/Employees/AddEmployeeScreen";
 import EditEmployeeScreen from "../screens/adminScreens/Employees/EditEmployeeScreen";
-import type { EmployeesStackParamList } from "./types";
+import type { EmployeesStackParamList } from "../types/navigation";
 
 const Stack = createNativeStackNavigator<EmployeesStackParamList>();
 
