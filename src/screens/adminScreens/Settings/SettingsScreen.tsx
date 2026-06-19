@@ -13,6 +13,7 @@ import { SettingsRowCard } from "./components/SettingsRowCard";
 import { LogoutConfirmSheet } from "./components/LogoutConfirmSheet";
 import { ACCOUNT_SECTION, SETTINGS_SECTIONS } from "./data/settingsItems";
 import { SettingsRow } from "./types";
+import { useAuthStore } from "@/store/authStore";
 
 /** Reserve room for the floating bottom tab bar (matches DashboardScreen). */
 const TAB_BAR_CLEARANCE = 72;
@@ -36,6 +37,7 @@ type SettingsNavigationProp = NativeStackNavigationProp<
 export default function SettingsScreen() {
   const insets = useSafeAreaInsets();
   const navigation = useNavigation<SettingsNavigationProp>();
+  const signOut = useAuthStore((s) => s.signOut);
   const [logoutSheetVisible, setLogoutSheetVisible] = useState(false);
 
   const handleRowPress = useCallback(
@@ -51,14 +53,13 @@ export default function SettingsScreen() {
     setLogoutSheetVisible(true);
   }, []);
 
-  const handleLogoutConfirm = useCallback(() => {
+  const handleLogoutConfirm = useCallback(async () => {
     setLogoutSheetVisible(false);
-    // Real sign-out is owned by the auth slice — left as a placeholder
-    // for the UI-only milestone, intentionally kept as a console log so
-    // the dev wiring is discoverable in the next pass.
-    // eslint-disable-next-line no-console
-    console.log("[settings] logout confirmed");
-  }, []);
+    // Clears the persisted session and flips auth status to "unauthenticated".
+    // RootNavigator subscribes to that status and swaps the Admin tree back
+    // to the Login screen automatically.
+    await signOut();
+  }, [signOut]);
 
   const handleLogoutCancel = useCallback(() => {
     setLogoutSheetVisible(false);
