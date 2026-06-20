@@ -1,7 +1,7 @@
 /**
  * Navigation type definitions for the app
  * Unified navigation types to ensure consistency across the app
- * Updated to support SubmittedSuccessfully screen
+ * Updated to support Staff and Driver modules
  */
 
 import type { AllTripsTrip, TripExpense } from './driver';
@@ -22,10 +22,25 @@ export type DriverTabParamList = {
   Checkout: undefined;
 };
 
+// Staff Tab Navigation
+export type StaffTabParamList = {
+  StaffHome: undefined;
+  AddDelivery: undefined;
+  AllDeliveries: undefined;
+  StaffCheckout: undefined;
+};
+
 // Driver Stack Navigation (root navigator for DRIVER role)
 export type DriverStackParamList = {
   DriverStartDay: undefined;
   DriverMain: undefined;
+  SubmittedSuccessfully: undefined;
+};
+
+// Staff Stack Navigation (root navigator for STAFF role)
+export type StaffStackParamList = {
+  StaffStartDay: undefined;
+  StaffMain: undefined;
   SubmittedSuccessfully: undefined;
 };
 

@@ -3,19 +3,15 @@
  *
  * Composition (top → bottom):
  *   1. `LoginHero`             — brand, car illustration and tagline (white).
- *   2. Curved cream container  — \"Welcome!\" + form card with mobile + PIN + CTA.
+ *   2. Curved cream container  — "Welcome!" + form card with mobile + PIN + CTA.
  *   3. `TricolourStrip`        — saffron / white / green accent line.
  *
  * Behaviour:
  *   - Validates inputs locally (10 digit mobile, 4 digit PIN).
  *   - Calls `useAuthStore.signIn` which hits the mock service.
  *   - On ADMIN  → router routes to AdminNavigator automatically via authStore.
- *   - On DRIVER → blocked here with a toast (module not built yet).
- *   - On STAFF  → blocked here with a toast (module not built yet).
- *
- *   The blocking decision lives next to the screen because RootNavigator
- *   currently has no STAFF/DRIVER navigator wired and we don't want to
- *   leave the user on a blank screen after a successful sign-in.
+ *   - On DRIVER → router routes to DriverNavigator automatically via authStore.
+ *   - On STAFF  → router routes to StaffNavigator automatically via authStore.
  */
 import React, { useCallback, useState } from "react";
 import {
@@ -57,7 +53,7 @@ export default function LoginScreen() {
 
   const isSubmitting = useAuthStore((s) => s.isSubmitting);
   const signIn = useAuthStore((s) => s.signIn);
-  const signOut = useAuthStore((s) => s.signOut);
+  
 
   const [mobile, setMobile] = useState("");
   const [pin, setPin] = useState("");
@@ -85,14 +81,9 @@ export default function LoginScreen() {
       showToast(result.error, "error");
       return;
     }
-    // DRIVER module is will be there implemented - allow login.
-
-    if (result.role === "STAFF") {
-      await signOut();
-      showToast("Staff module coming soon", "info");
-      return;
-    }
-  }, [mobile, pin, signIn, signOut, showToast]);
+    // All roles (ADMIN, DRIVER, STAFF) are now supported
+    // RootNavigator will automatically route to the correct module based on role
+  }, [mobile, pin, signIn, showToast]);
 
   const canSubmit = mobile.length === 10 && pin.length === 4 && !isSubmitting;
 
@@ -187,6 +178,17 @@ export default function LoginScreen() {
                 >
                   <Text style={styles.hintText}>Demo Driver</Text>
                 </Pressable>
+                <Pressable
+                  testID="login-fill-staff"
+                  onPress={() => {
+                    setMobile("8877665544");
+                    setPin("2222");
+                  }}
+                  hitSlop={8}
+                  style={styles.hintChip}
+                >
+                  <Text style={styles.hintText}>Demo Staff</Text>
+                </Pressable>
               </View>
             </View>
           </View>
@@ -258,6 +260,7 @@ const styles = StyleSheet.create({
   hintRow: {
     flexDirection: "row",
     justifyContent: "center",
+    flexWrap: "wrap",
     gap: 10,
     marginTop: 14,
   },
