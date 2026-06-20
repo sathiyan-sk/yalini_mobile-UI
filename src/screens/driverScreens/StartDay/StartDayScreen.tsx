@@ -31,7 +31,7 @@ interface DriverStartDayScreenProps {
 
 export default function DriverStartDayScreen({ showNoAssignment = false }: DriverStartDayScreenProps) {
   const insets = useSafeAreaInsets();
-  const navigation = useNavigation<StartDayNavigationProp>();
+  const navigation = useNavigation<NavigationProp>();
 
   
   // Use mock data based on prop (for demo purposes)
@@ -96,8 +96,7 @@ export default function DriverStartDayScreen({ showNoAssignment = false }: Drive
               vehicleName={data.assignment.vehicleName}
             />
             <InfoBanner
-              message="You have a vehicle assigned for today.
-Tap Start Day to begin your work."
+              message="You have a vehicle assigned for today. Tap Start Day to begin your work."
             />
             <StartDayButton onPress={handleStartDay} />
           </>
