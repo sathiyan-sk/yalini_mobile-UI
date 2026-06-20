@@ -1,28 +1,17 @@
 /**
- * Staff module navigator — placeholder until the Staff experience ships.
+ * Staff module navigator — shows the Start Day screen and future staff screens.
  */
 import React from "react";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 
-import { PlaceholderScreen } from "../../../screens/PlaceholderScreen";
+import StaffStartDayScreen from "../../../screens/staffScreens/StartDay/StaffStartDayScreen";
 
 const Stack = createNativeStackNavigator();
-
-function StaffHome() {
-  return (
-    <PlaceholderScreen
-      title="Staff"
-      icon="user"
-      description="The Staff module is coming soon."
-      testID="staff-placeholder"
-    />
-  );
-}
 
 export default function StaffNavigator() {
   return (
     <Stack.Navigator screenOptions={{ headerShown: false }}>
-      <Stack.Screen name="StaffHome" component={StaffHome} />
+      <Stack.Screen name="StaffStartDay" component={StaffStartDayScreen} />
     </Stack.Navigator>
   );
 }
