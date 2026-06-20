@@ -78,3 +78,37 @@ export interface Trip {
   createdAt: string;
   status: "completed" | "cancelled";
 }
+/**
+ * Type definitions for AddExpense screen
+ */
+
+export interface TripData {
+  tripId: string;
+  from: string;
+  to: string;
+  date: string;
+  time: string;
+  paymentMode: 'Cash' | 'Online';
+  amount: number;
+}
+
+export interface ExpenseCategory {
+  id: string;
+  name: string;
+  subtitle: string;
+  icon: string;
+  iconLibrary: 'MaterialIcons' | 'Feather' | 'FontAwesome5';
+  color: string;
+  backgroundColor: string;
+  defaultValue: number;
+}
+
+export interface ExpenseFormData {
+  fuel: string;
+  toll: string;
+  food: string;
+  other: string;
+  notes: string;
+}
+
+export type ExpenseField = 'fuel' | 'toll' | 'food' | 'other';

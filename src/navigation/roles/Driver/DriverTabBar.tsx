@@ -16,6 +16,7 @@ import type { DriverTabParamList } from "../../../types/navigation"
 
 import DriverHomeScreen from "../../../screens/driverScreens/Home/DriverHomeScreen"
 import AddTripScreen from "../../../screens/driverScreens/AddTrip/AddTripScreen"
+import addExpense from "../../../screens/driverScreens/AddExpense/AddExpenseScreen"
 
 // ─────────────────────────────────────
 // DRIVER TAB CONFIG
@@ -42,6 +43,7 @@ export default function DriverTabBar() {
     > 
       <Tab.Screen name="DriverHome" component={DriverHomeScreen} />
       <Tab.Screen name="AddTrip"    component={AddTripScreen}    />
+      <Tab.Screen name="AddTrip"   component={addExpense}       />
     </Tab.Navigator>
   )
 }
