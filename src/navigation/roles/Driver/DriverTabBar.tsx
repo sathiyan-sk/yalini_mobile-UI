@@ -1,20 +1,21 @@
 /**
- * DriverTabNavigator — bottom tab navigator for DRIVER role.
+* DriverTabNavigator — bottom tab navigator for DRIVER role.
  * Mounted after driver starts their daily session.
  *
  * Tabs:
- *   Home     → DriverHomeScreen   (session overview)
- *   AddTrip  → AddTripScreen      (add new trip)
- *   AllTrips → AllTripsScreen     (view all trips)
- *   Checkout → CheckoutScreen     (submit session)
+ * Home → DriverHomeScreen (session overview)
+ * AddTrip → AddTripScreen (add new trip)
+ * AllTrips → AllTripsScreen (view all trips) - Placeholder
+ * Checkout → CheckoutScreen (submit session) - Placeholder
  */
+
 import React from "react"
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs"
-
 import { AppTabBar, TabBarConfig } from "../../AppTabBar"
 import type { DriverTabParamList } from "../../../types/navigation"
 
 import DriverHomeScreen from "../../../screens/driverScreens/Home/DriverHomeScreen"
+import AddTripScreen from "../../../screens/driverScreens/AddTrip/AddTripScreen"
 
 // ─────────────────────────────────────
 // DRIVER TAB CONFIG
@@ -23,7 +24,7 @@ const DRIVER_TAB_CONFIG: TabBarConfig = {
   DriverHome: { label: "Home",      icon: "home"         },
   AddTrip:    { label: "Add Trip",  icon: "plus-circle"  },
   AllTrips:   { label: "All Trips", icon: "list"         },
-  Checkout:   { label: "Checkout",  icon: "check-circle" },
+  Checkout:   { label: "Checkout",  icon: "check-square" },
 }
 
 const Tab = createBottomTabNavigator<DriverTabParamList>()
@@ -40,9 +41,7 @@ export default function DriverTabBar() {
       )}
     > 
       <Tab.Screen name="DriverHome" component={DriverHomeScreen} />
-      {/* <Tab.Screen name="AddTrip"    component={AddTripScreen}    />
-      <Tab.Screen name="AllTrips"   component={AllTripsScreen}   />
-      <Tab.Screen name="Checkout"   component={CheckoutScreen}   /> */}
+      <Tab.Screen name="AddTrip"    component={AddTripScreen}    />
     </Tab.Navigator>
   )
 }

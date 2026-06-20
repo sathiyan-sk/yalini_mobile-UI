@@ -4,6 +4,8 @@
 
 export type SessionStatus = "OPEN" | "SUBMITTED";
 
+export type PaymentMode = "cash" | "online";
+
 export interface DriverAssignment {
   vehicleId: string;
   vehicleName: string;
@@ -50,4 +52,29 @@ export interface DriverHomeData {
   todayOverview: TodayOverview;
   recentActivity: RecentActivity[];
   notificationCount: number;
+}
+/**
+ * Trip Form Data - Used for Add Trip screen
+ */
+export interface TripFormData {
+  from: string;
+  to: string;
+  amount: string;
+  paymentMode: PaymentMode;
+}
+
+/**
+ * Trip - Complete trip data structure
+ */
+export interface Trip {
+  id: string;
+  from: string;
+  to: string;
+  amount: number;
+  paymentMode: PaymentMode;
+  driverId: string;
+  vehicleId: string;
+  sessionId: string;
+  createdAt: string;
+  status: "completed" | "cancelled";
 }
