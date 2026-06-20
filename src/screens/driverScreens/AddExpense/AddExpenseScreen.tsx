@@ -173,7 +173,6 @@ export default function AddExpenseScreen() {
         <AddExpenseHeader
           onBackPress={handleBackPress}
           onHelpPress={handleHelpPress}
-          title={mode === 'edit' ? 'Edit Expense' : 'Add Expense'}
         />
 
         <ScrollView
@@ -207,7 +206,6 @@ export default function AddExpenseScreen() {
             onSaveExpense={handleSaveExpense}
             onSkipExpense={handleSkipExpense}
             isSubmitting={isSubmitting}
-            isEditMode={mode === 'edit'}
           />
         </ScrollView>
       </KeyboardAvoidingView>

@@ -2,6 +2,7 @@
  * AddTripScreen - Screen to add a new trip in Driver module
  * Allows driver to enter trip details: From, To, Amount, Payment Mode
  * Follows the design specifications with pixel-perfect implementation
+ * Now connected to tripStore for real data management
  */
 
 import React, { useState, useCallback } from "react";
@@ -14,7 +15,9 @@ import {
   Alert,
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { useNavigation } from "@react-navigation/native";
+import { useNavigation, CompositeNavigationProp } from "@react-navigation/native";
+import { BottomTabNavigationProp } from "@react-navigation/bottom-tabs";
+import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 
 import { colors, spacing } from "../../../theme";
 import {
@@ -23,23 +26,24 @@ import {
   TripDetailsForm,
   InfoNote,
 } from "../AddTrip/components";
+import { useTripStore } from "../../../store/tripStore";
 import type { TripFormData, PaymentMode } from "../../../types/driver";
-
-// Mock session data - In real app, this would come from context/store
-const MOCK_SESSION_DATA = {
-  serviceName: "City Taxi Service",
-  driverName: "Ramesh Kumar",
-  vehicleNumber: "TN 01 AB 1234",
-  sessionStatus: "Day Started" as const,
-  sessionDate: "10 May 2024",
-  sessionTime: "08:05 AM",
-};
+import type { DriverTabParamList, AllTripsStackParamList } from "../../../types/navigation";
 
 const BACKGROUND_COLOR = colors.surfaceSecondary;
 
+// Navigation type for AddTrip screen
+type AddTripNavigationProp = CompositeNavigationProp<
+  BottomTabNavigationProp<DriverTabParamList, 'AddTrip'>,
+  NativeStackNavigationProp<AllTripsStackParamList>
+>;
+
 export default function AddTripScreen() {
   const insets = useSafeAreaInsets();
-  const navigation = useNavigation();
+  const navigation = useNavigation<AddTripNavigationProp>();
+
+  // Get session and addTrip action from store
+  const { session, addTrip } = useTripStore();
 
   // Form state
   const [formData, setFormData] = useState<TripFormData>({
@@ -80,6 +84,15 @@ export default function AddTripScreen() {
     );
   }, []);
 
+  const resetForm = useCallback(() => {
+    setFormData({
+      from: "",
+      to: "",
+      amount: "",
+      paymentMode: "cash",
+    });
+  }, []);
+
   const handleSaveTrip = useCallback(async () => {
     // Validation
     if (!formData.from.trim()) {
@@ -98,32 +111,50 @@ export default function AddTripScreen() {
     setIsSubmitting(true);
 
     try {
-      // Simulate API call
-      await new Promise((resolve) => setTimeout(resolve, 1000));
+      // Save trip to store and get the new trip ID
+      const newTripId = addTrip({
+        from: formData.from.trim(),
+        to: formData.to.trim(),
+        amount: parseFloat(formData.amount),
+        paymentMode: formData.paymentMode,
+      });
 
-      // Show success and navigate back
-      Alert.alert("Success", "Trip saved successfully!", [
-        {
-          text: "OK",
-          onPress: () => {
-            // Reset form
-            setFormData({
-              from: "",
-              to: "",
-              amount: "",
-              paymentMode: "cash",
-            });
-            // Navigate to AllTrips or stay on screen based on requirement
-            // navigation.navigate("AllTrips");
+      // Reset form
+      resetForm();
+
+      // Show success with options
+      Alert.alert(
+        "Trip Saved!",
+        "Would you like to add expenses for this trip or continue?",
+        [
+          {
+            text: "Add Expense",
+            onPress: () => {
+              // Navigate to AllTripsStack and then to AddExpenseForTrip
+              navigation.navigate("AllTripsStack", {
+                screen: "AddExpenseForTrip",
+                params: { tripId: newTripId, mode: "add" },
+              } as any);
+            },
           },
-        },
-      ]);
+          {
+            text: "View All Trips",
+            onPress: () => {
+              navigation.navigate("AllTripsStack");
+            },
+          },
+          {
+            text: "Add Another Trip",
+            style: "cancel",
+          },
+        ]
+      );
     } catch (error) {
       Alert.alert("Error", "Failed to save trip. Please try again.");
     } finally {
       setIsSubmitting(false);
     }
-  }, [formData]);
+  }, [formData, addTrip, navigation, resetForm]);
 
   return (
     <View style={styles.container}>
@@ -146,14 +177,14 @@ export default function AddTripScreen() {
           showsVerticalScrollIndicator={false}
           keyboardShouldPersistTaps="handled"
         >
-          {/* Service Info Card */}
+          {/* Service Info Card - Use session data from store */}
           <ServiceInfoCard
-            serviceName={MOCK_SESSION_DATA.serviceName}
-            driverName={MOCK_SESSION_DATA.driverName}
-            vehicleNumber={MOCK_SESSION_DATA.vehicleNumber}
-            sessionStatus={MOCK_SESSION_DATA.sessionStatus}
-            sessionDate={MOCK_SESSION_DATA.sessionDate}
-            sessionTime={MOCK_SESSION_DATA.sessionTime}
+            serviceName={session.serviceName}
+            driverName={session.driverName}
+            vehicleNumber={session.vehicleNumber}
+            sessionStatus={session.sessionStatus}
+            sessionDate={session.sessionDate}
+            sessionTime={session.sessionTime}
           />
 
           {/* Trip Details Form */}

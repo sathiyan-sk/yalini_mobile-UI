@@ -24,7 +24,7 @@ import { useAuthStore } from "../store/authStore";
 import LoginScreen from "../screens/auth/loginScreen/LoginScreen";
 import AdminNavigator from "./roles/Admin/AdminNavigator";
 import DriverNavigator from "./roles/Driver/DriverNavigator";
-import StaffNavigator from "./roles/Staff/StaffNavigator";
+//import StaffNavigator from "./roles/Staff/StaffNavigator";
 import { colors } from "../theme";
 
 const Stack = createNativeStackNavigator();
@@ -48,7 +48,9 @@ function RoleBasedNavigator() {
     case "DRIVER":
       return <DriverNavigator />;
     case "STAFF":
-      return <StaffNavigator />;
+      // return <StaffNavigator />;
+    default:
+      return null;
   }
 }
 

@@ -60,11 +60,11 @@ export const EXPENSE_CATEGORIES: ExpenseCategory[] = [
   },
 ];
 
-// Initial form data
+// Initial form data - starts with zeros for new expenses
 export const INITIAL_EXPENSE_FORM: ExpenseFormData = {
-  fuel: '110',
-  toll: '40',
-  food: '30',
-  other: '20',
+  fuel: '0',
+  toll: '0',
+  food: '0',
+  other: '0',
   notes: '',
 };

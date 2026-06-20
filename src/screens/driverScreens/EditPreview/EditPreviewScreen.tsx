@@ -4,7 +4,7 @@
  * Uses tripStore for data management
  */
 
-import React, { useState, useCallback, useMemo, useEffect } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 import {
   StyleSheet,
   View,
@@ -12,6 +12,8 @@ import {
   KeyboardAvoidingView,
   Platform,
   Alert,
+  Text,
+  ActivityIndicator,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
@@ -63,6 +65,17 @@ export default function EditPreviewScreen() {
     paymentMode: 'cash',
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [tripNotFound, setTripNotFound] = useState(false);
+
+  // Handle trip not found
+  useEffect(() => {
+    if (!trip && !tripNotFound) {
+      setTripNotFound(true);
+      Alert.alert('Error', 'Trip not found', [
+        { text: 'OK', onPress: () => navigation.goBack() }
+      ]);
+    }
+  }, [trip, tripNotFound, navigation]);
 
   // Initialize form data when trip loads
   useEffect(() => {
@@ -114,10 +127,11 @@ export default function EditPreviewScreen() {
   }, [navigation]);
 
   const handleEditExpense = useCallback(() => {
+    if (!trip) return;
     // Navigate to AddExpenseForTrip screen with mode 'edit'
-    const mode = trip?.hasExpense ? 'edit' : 'add';
+    const mode = trip.hasExpense ? 'edit' : 'add';
     navigation.navigate('AddExpenseForTrip', { tripId, mode });
-  }, [navigation, tripId, trip?.hasExpense]);
+  }, [navigation, tripId, trip]);
 
   const handleSaveChanges = useCallback(async () => {
     // Validation
@@ -181,15 +195,14 @@ export default function EditPreviewScreen() {
     );
   }, [navigation, tripId, deleteTrip]);
 
-  // If trip not found, show error and go back
+  // If trip not found, show loading/error state
   if (!trip) {
     return (
       <View style={styles.container}>
         <EditTripHeader onBackPress={handleBackPress} />
         <View style={styles.errorContainer}>
-          <Alert.alert('Error', 'Trip not found', [
-            { text: 'OK', onPress: () => navigation.goBack() }
-          ]);
+          <ActivityIndicator size="large" color={colors.primaryBlue} />
+          <Text style={styles.errorText}>Loading trip...</Text>
         </View>
       </View>
     );
@@ -276,5 +289,11 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
+    padding: spacing.xl,
+  },
+  errorText: {
+    marginTop: spacing.md,
+    fontSize: 16,
+    color: colors.textSecondary,
   },
 });
