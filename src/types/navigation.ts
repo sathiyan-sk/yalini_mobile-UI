@@ -17,15 +17,12 @@ export type DriverTabParamList = {
   AddTrip: undefined;
   AllTrips: undefined;
   Checkout: undefined;
-  More: undefined;
 };
 
-// Driver Stack Navigation
+// Driver Stack Navigation (root navigator for DRIVER role)
 export type DriverStackParamList = {
-  DriverTabs: undefined;
-  AddExpense: { tripId?: string };
-  TripDetails: { tripId: string };
-  StartDayInfo: undefined;
+  DriverStartDay: undefined;
+  DriverMain: undefined;
 };
 
 /**

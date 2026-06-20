@@ -5,6 +5,8 @@
 import React, { useState } from 'react';
 import { StyleSheet, View, ScrollView, Alert } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { useNavigation } from '@react-navigation/native';
+import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 
 import { StartDayHeader } from './components/StartDayHeader';
 import { ServiceInfoCard } from './components/ServiceInfoCard';
@@ -15,6 +17,10 @@ import { StartDayButton } from './components/StartDayButton';
 import { ContactAdminButton } from './components/ContactAdminButton';
 import { DRIVER_WITH_VEHICLE, DRIVER_WITHOUT_VEHICLE } from './data/mockData';
 import type { StartDayData } from './types';
+import type { DriverStackParamList } from '../../../types/navigation';
+
+
+type NavigationProp = NativeStackNavigationProp<DriverStackParamList>;
 
 const BACKGROUND_COLOR = '#F7F8FA';
 
@@ -25,6 +31,8 @@ interface DriverStartDayScreenProps {
 
 export default function DriverStartDayScreen({ showNoAssignment = false }: DriverStartDayScreenProps) {
   const insets = useSafeAreaInsets();
+  const navigation = useNavigation<StartDayNavigationProp>();
+
   
   // Use mock data based on prop (for demo purposes)
   const [data] = useState<StartDayData>(
@@ -42,7 +50,13 @@ export default function DriverStartDayScreen({ showNoAssignment = false }: Drive
     Alert.alert(
       'Start Day',
       'Your day has started! Safe travels.',
-      [{ text: 'OK' }]
+      [{ 
+        text: 'OK',
+        onPress: () => {
+          // Navigate to DriverMain (bottom tabs) after starting day
+          navigation.replace('DriverMain');
+        }
+      }]
     );
   };
 

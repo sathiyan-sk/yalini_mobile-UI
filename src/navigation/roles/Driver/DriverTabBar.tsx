@@ -4,8 +4,8 @@
  *
  * Tabs:
  *   Home     → DriverHomeScreen   (session overview)
- *   Income   → IncomeNavigator    (list + add income)
- *   Expense  → ExpenseNavigator   (list + add expense)
+ *   AddTrip  → AddTripScreen      (add new trip)
+ *   AllTrips → AllTripsScreen     (view all trips)
  *   Checkout → CheckoutScreen     (submit session)
  */
 import React from "react"
@@ -20,10 +20,10 @@ import DriverHomeScreen from "../../../screens/driverScreens/Home/DriverHomeScre
 // DRIVER TAB CONFIG
 // ─────────────────────────────────────
 const DRIVER_TAB_CONFIG: TabBarConfig = {
-  DriverHome:     { label: "Home",     icon: "home"          },
-  AddTrip:   { label: "Add Trip",   icon: "plus-circle"   },
-  AllTrips:  { label: "All Trips",  icon: "list" },
-  Checkout: { label: "Checkout", icon: "check-circle"  },
+  DriverHome: { label: "Home",      icon: "home"         },
+  AddTrip:    { label: "Add Trip",  icon: "plus-circle"  },
+  AllTrips:   { label: "All Trips", icon: "list"         },
+  Checkout:   { label: "Checkout",  icon: "check-circle" },
 }
 
 const Tab = createBottomTabNavigator<DriverTabParamList>()
@@ -38,8 +38,11 @@ export default function DriverTabBar() {
           tabConfig={DRIVER_TAB_CONFIG}
         />
       )}
-    >
-      <Tab.Screen name="DriverHome"     component={DriverHomeScreen} />
+    > 
+      <Tab.Screen name="DriverHome" component={DriverHomeScreen} />
+      {/* <Tab.Screen name="AddTrip"    component={AddTripScreen}    />
+      <Tab.Screen name="AllTrips"   component={AllTripsScreen}   />
+      <Tab.Screen name="Checkout"   component={CheckoutScreen}   /> */}
     </Tab.Navigator>
   )
 }
