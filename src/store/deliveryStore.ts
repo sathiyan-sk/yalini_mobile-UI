@@ -41,6 +41,10 @@ interface DeliveryActions {
   setHotels: (hotels: HotelOption[]) => void;
   /** Adds a delivery record */
   addDelivery: (delivery: DeliveryRecord) => void;
+    /** Updates an existing delivery record */
+  updateDelivery: (id: string, updates: Partial<DeliveryRecord>) => void;
+  /** Gets a delivery record by ID */
+  getDeliveryById: (id: string) => DeliveryRecord | undefined;
   /** Removes a delivery record */
   removeDelivery: (id: string) => void;
   /** Sets loading state */
@@ -114,6 +118,26 @@ export const useDeliveryStore = create<DeliveryState & DeliveryActions>()(
       set((state) => ({
         deliveries: [delivery, ...state.deliveries],
       })),
+/**
+     * Updates an existing delivery record by ID.
+     * @param id - The delivery ID to update
+     * @param updates - Partial delivery data to update
+     */
+    updateDelivery: (id, updates) =>
+      set((state) => ({
+        deliveries: state.deliveries.map((d) =>
+          d.id === id ? { ...d, ...updates } : d
+        ),
+      })),
+         /**
+     * Gets a delivery record by ID.
+     * @param id - The delivery ID to find
+     * @returns The delivery record or undefined
+     */
+    getDeliveryById: (id) => {
+      const state = useDeliveryStore.getState();
+      return state.deliveries.find((d) => d.id === id);
+    },
 
     /**
      * Removes a delivery record by ID.
