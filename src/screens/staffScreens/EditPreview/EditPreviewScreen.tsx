@@ -89,8 +89,10 @@ export default function EditPreviewScreen() {
         expenseCategory: delivery.expenseCategory,
         expenseAmount: delivery.expenseAmount,
       });
+            // Reset deliveryNotFound flag when we find the delivery
+      setDeliveryNotFound(false);
     }
-  }, [delivery?.id]);
+   }, [deliveryId, delivery]);
 
   // Update outstanding cans when delivered or returned changes
   useEffect(() => {
