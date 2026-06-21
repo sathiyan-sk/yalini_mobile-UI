@@ -4,14 +4,54 @@
  * Uses Zustand for lightweight, TypeScript-first state management.
  * Manages delivery session state, form data, and delivery records.
  */
-
 import { create } from 'zustand';
-import type {
-  DeliverySessionData,
-  DeliveryRecord,
-  HotelOption,
-  SessionStatus,
-} from '../screens/staffScreens/AddDelivery/types';
+/**
+ * Session status types
+ */
+export type SessionStatus = 'PENDING' | 'ACTIVE' | 'SUBMITTED';
+
+/**
+ * Hotel option for selection
+ */
+export interface HotelOption {
+  id: string;
+  name: string;
+  location?: string;
+}
+
+/**
+ * Delivery session data
+ */
+export interface DeliverySessionData {
+  id: string;
+  staffName: string;
+  serviceName: string;
+  sessionDate: string;
+  sessionTime: string;
+  sessionStatus: SessionStatus;
+}
+
+/**
+ * Delivery record
+ */
+export interface DeliveryRecord {
+  id: string;
+  hotelId: string;
+  hotelName: string;
+  ratePerCan: number;
+  loadedCans: number;
+  cansDelivered: number;
+  cansReturned: number;
+  outstandingCans: number;
+  receivedIncome: number;
+  paymentMode: 'CASH' | 'ONLINE';
+  expenseCategory?: 'FUEL' | 'OTHERS';
+  estAmount: number;
+  expenseAmount?: number;
+  expenseDescription?: string;
+  timestamp: string;
+  notes?: string;
+}
 
 /**
  * Delivery store state shape.
@@ -41,7 +81,7 @@ interface DeliveryActions {
   setHotels: (hotels: HotelOption[]) => void;
   /** Adds a delivery record */
   addDelivery: (delivery: DeliveryRecord) => void;
-    /** Updates an existing delivery record */
+  /** Updates an existing delivery record */
   updateDelivery: (id: string, updates: Partial<DeliveryRecord>) => void;
   /** Gets a delivery record by ID */
   getDeliveryById: (id: string) => DeliveryRecord | undefined;
@@ -85,8 +125,8 @@ const initialState: DeliveryState = {
  * Zustand store for delivery state management.
  * Provides centralized state for the Staff delivery module.
  */
-export const useDeliveryStore = create<DeliveryState & DeliveryActions>()(
-  (set) => ({
+export const useDeliveryStore = create<DeliveryState & DeliveryActions>(
+  (set, get) => ({
     ...initialState,
 
     /**
@@ -118,7 +158,8 @@ export const useDeliveryStore = create<DeliveryState & DeliveryActions>()(
       set((state) => ({
         deliveries: [delivery, ...state.deliveries],
       })),
-/**
+
+    /**
      * Updates an existing delivery record by ID.
      * @param id - The delivery ID to update
      * @param updates - Partial delivery data to update
@@ -129,15 +170,13 @@ export const useDeliveryStore = create<DeliveryState & DeliveryActions>()(
           d.id === id ? { ...d, ...updates } : d
         ),
       })),
-         /**
+
+    /**
      * Gets a delivery record by ID.
      * @param id - The delivery ID to find
      * @returns The delivery record or undefined
      */
-    getDeliveryById: (id) => {
-      const state = useDeliveryStore.getState();
-      return state.deliveries.find((d) => d.id === id);
-    },
+    getDeliveryById: (id) => get().deliveries.find((d) => d.id === id),
 
     /**
      * Removes a delivery record by ID.

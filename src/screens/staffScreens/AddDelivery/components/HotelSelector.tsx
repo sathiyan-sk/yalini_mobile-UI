@@ -303,6 +303,7 @@ export function HotelSelector({
           </View>
         </View>
       </Modal>
+      
     </View>
   );
 }

@@ -1,25 +1,46 @@
 /**
  * Mock data for Staff Home Screen
- * Will be replaced with real API data later
  */
-
 import type { StaffSessionData } from '../types';
 
 export const MOCK_STAFF_SESSION: StaffSessionData = {
   staffId: 'staff_001',
-  staffName: 'Mani',
-  businessName: 'Yalini Water Delivery',
-  sessionDate: new Date().toISOString().split('T')[0],
-  sessionTime: new Date().toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' }),
+  staffName: 'Rajan Kumar',
+  businessName: 'Yalini Minerals',
+  sessionDate: new Date().toLocaleDateString('en-IN', {
+    weekday: 'long',
+    day: '2-digit',
+    month: 'short',
+    year: 'numeric',
+  }),
+  sessionTime: new Date().toLocaleTimeString('en-IN', {
+    hour: '2-digit',
+    minute: '2-digit',
+  }),
   assignedHotels: [
-    { hotelId: 'hotel_a', hotelName: 'Hotel A', location: 'MG Road' },
-    { hotelId: 'hotel_c', hotelName: 'Hotel C', location: 'Anna Nagar' },
-    { hotelId: 'hotel_e', hotelName: 'Hotel E', location: 'Velachery' },
-    { hotelId: 'hotel_g', hotelName: 'Hotel G', location: 'T Nagar' },
-    { hotelId: 'hotel_h', hotelName: 'Hotel H', location: 'Adyar' },
+    {
+      hotelId: 'hotel_001',
+      hotelName: 'Grand Palace Hotel',
+      location: 'Anna Nagar',
+    },
+    {
+      hotelId: 'hotel_002',
+      hotelName: 'Royal Inn',
+      location: 'T Nagar',
+    },
+    {
+      hotelId: 'hotel_003',
+      hotelName: 'Sunrise Lodge',
+      location: 'Velachery',
+    },
+    {
+      hotelId: 'hotel_004',
+      hotelName: 'City View Hotel',
+      location: 'Adyar',
+    },
   ],
   overview: {
-    assignedHotels: 5,
+    assignedHotels: 4,
     deliveriesDone: 0,
     cashCollected: 0,
     creditSales: 0,

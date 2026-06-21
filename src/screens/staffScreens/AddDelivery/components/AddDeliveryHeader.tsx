@@ -62,7 +62,7 @@ export function AddDeliveryHeader({
 
 const styles = StyleSheet.create({
   header: {
-    paddingBottom: spacing.xxxl,
+    paddingBottom: spacing.lg,
     paddingHorizontal: spacing.lg,
   },
   headerContent: {

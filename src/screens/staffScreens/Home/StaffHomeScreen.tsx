@@ -17,7 +17,6 @@ import type { BottomTabNavigationProp } from '@react-navigation/bottom-tabs';
 import { colors, spacing } from '../../../theme';
 import { useAuthStore } from '../../../store/authStore';
 import type { StaffTabParamList } from '../../../types/navigation';
-
 import {
   StaffHomeHeader,
   TodayOverview,
@@ -55,7 +54,6 @@ export default function StaffHomeScreen() {
     const interval = setInterval(() => {
       setGreeting(getGreeting());
     }, 60000); // Update every minute
-
     return () => clearInterval(interval);
   }, []);
 

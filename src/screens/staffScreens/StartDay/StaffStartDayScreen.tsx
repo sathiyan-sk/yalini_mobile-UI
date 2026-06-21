@@ -112,7 +112,7 @@ export default function StaffStartDayScreen({ showNoAssignment = false }: StaffS
               onViewHotels={handleViewHotels}
             />
             <InfoBanner
-              message="You have hotels assigned for today.
+              message="You have hotels assigned for today. so,
 Tap Start Day to begin your work."
             />
             <StartDayButton onPress={handleStartDay} />

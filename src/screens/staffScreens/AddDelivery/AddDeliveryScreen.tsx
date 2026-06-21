@@ -390,12 +390,6 @@ export default function AddDeliveryScreen(): React.JSX.Element {
 
   return (
     <View style={styles.container} testID="add-delivery-screen">
-      {/* Header */}
-      <AddDeliveryHeader
-        onBackPress={handleBackPress}
-        topInset={insets.top}
-        testID="add-delivery-header"
-      />
 
       <KeyboardAvoidingView
         behavior={Platform.OS === 'ios' ? 'padding' : undefined}
@@ -407,9 +401,16 @@ export default function AddDeliveryScreen(): React.JSX.Element {
           showsVerticalScrollIndicator={false}
           keyboardShouldPersistTaps="handled"
           contentContainerStyle={{
-            paddingBottom: insets.bottom + spacing.xl + 80,
+          paddingBottom: insets.bottom + spacing.xl + 80,
           }}
-        >
+          >
+          {/* Header */}
+          <AddDeliveryHeader
+            onBackPress={handleBackPress}
+            topInset={insets.top}
+            testID="add-delivery-header"
+          />
+          
           {/* Session Info Card */}
           <SessionInfoCard
             session={session}

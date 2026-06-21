@@ -20,6 +20,7 @@ import React from "react";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 
 import StaffStartDayScreen from "../../../screens/staffScreens/StartDay/StaffStartDayScreen";
+import SubmittedSuccessfullyScreen from "../../../screens/staffScreens/SubmittedSuccessfully/StaffSubmittedScreen";
 import StaffTabBar from "./StaffTabBar";
 
 export type StaffStackParamList = {
@@ -40,6 +41,10 @@ export default function StaffNavigator() {
       <Stack.Screen
         name="StaffMain"
         component={StaffTabBar}
+      />
+      <Stack.Screen
+        name="SubmittedSuccessfully"
+        component={SubmittedSuccessfullyScreen}
       />
     </Stack.Navigator>
   );

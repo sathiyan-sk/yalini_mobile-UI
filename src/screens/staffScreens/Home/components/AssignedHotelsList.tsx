@@ -1,97 +1,158 @@
 /**
- * AssignedHotelsList - Shows list of hotels assigned to staff
+ * AssignedHotelsList - List of hotels assigned to the staff
+ * Shows all hotels the staff needs to deliver to today
  */
 import React from 'react';
-import { StyleSheet, Text, View, Pressable } from 'react-native';
-import { MaterialCommunityIcons } from '@expo/vector-icons';
+import { StyleSheet, View, Text, TouchableOpacity, FlatList } from 'react-native';
+import { Feather } from '@expo/vector-icons';
 
-import { colors, fontSize, spacing, radius, cardShadow } from '../../../../theme';
+import { colors, spacing, fontSize, radius, cardShadow, lightShadow } from '../../../../theme';
 import type { HotelInfo } from '../types';
 
 interface AssignedHotelsListProps {
   hotels: HotelInfo[];
-  onHotelPress?: (hotel: HotelInfo) => void;
-}
-
-function HotelItem({ hotel, onPress }: { hotel: HotelInfo; onPress?: () => void }) {
-  return (
-    <Pressable
-      onPress={onPress}
-      style={({ pressed }) => [
-        styles.hotelItem,
-        pressed && onPress && styles.hotelItemPressed,
-      ]}
-    >
-      <View style={styles.hotelIconContainer}>
-        <MaterialCommunityIcons name="office-building" size={20} color="#1976D2" />
-      </View>
-      <Text style={styles.hotelName}>{hotel.hotelName}</Text>
-    </Pressable>
-  );
+  onHotelPress: (hotel: HotelInfo) => void;
 }
 
 export function AssignedHotelsList({ hotels, onHotelPress }: AssignedHotelsListProps) {
+  const renderHotel = ({ item, index }: { item: HotelInfo; index: number }) => (
+    <TouchableOpacity
+      style={[styles.hotelCard, lightShadow]}
+      onPress={() => onHotelPress(item)}
+      activeOpacity={0.7}
+    >
+      <View style={styles.hotelIcon}>
+        <Feather name="home" size={20} color={colors.primaryBlue} />
+      </View>
+      <View style={styles.hotelInfo}>
+        <Text style={styles.hotelName}>{item.hotelName}</Text>
+        {item.location && (
+          <View style={styles.locationRow}>
+            <Feather name="map-pin" size={12} color={colors.textSecondary} />
+            <Text style={styles.locationText}>{item.location}</Text>
+          </View>
+        )}
+      </View>
+      <Feather name="chevron-right" size={20} color={colors.textTertiary} />
+    </TouchableOpacity>
+  );
+
   return (
     <View style={styles.container}>
-      <Text style={styles.sectionTitle}>Assigned Hotels</Text>
-      <View style={styles.card}>
-        {hotels.map((hotel, index) => (
-          <React.Fragment key={hotel.hotelId}>
-            <HotelItem
-              hotel={hotel}
-              onPress={onHotelPress ? () => onHotelPress(hotel) : undefined}
-            />
-            {index < hotels.length - 1 && <View style={styles.separator} />}
-          </React.Fragment>
-        ))}
+      <View style={styles.headerRow}>
+        <View style={styles.headerLeft}>
+          <Feather name="list" size={18} color={colors.primaryBlue} />
+          <Text style={styles.title}>Assigned Hotels</Text>
+        </View>
+        <View style={styles.badge}>
+          <Text style={styles.badgeText}>{hotels.length}</Text>
+        </View>
       </View>
+
+      {hotels.length > 0 ? (
+        <FlatList
+          data={hotels}
+          renderItem={renderHotel}
+          keyExtractor={(item) => item.hotelId}
+          scrollEnabled={false}
+          ItemSeparatorComponent={() => <View style={styles.separator} />}
+        />
+      ) : (
+        <View style={styles.emptyState}>
+          <Feather name="inbox" size={48} color={colors.textTertiary} />
+          <Text style={styles.emptyText}>No hotels assigned</Text>
+          <Text style={styles.emptySubtext}>Hotels will appear here once assigned</Text>
+        </View>
+      )}
     </View>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
+    backgroundColor: colors.surface,
+    borderRadius: radius.lg,
+    padding: spacing.lg,
     marginHorizontal: spacing.lg,
-    marginTop: spacing.xl,
+    ...cardShadow,
   },
-  sectionTitle: {
+  headerRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginBottom: spacing.md,
+  },
+  headerLeft: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.sm,
+  },
+  title: {
     fontSize: fontSize.lg,
     fontWeight: '600',
     color: colors.textPrimary,
-    marginBottom: spacing.md,
   },
-  card: {
-    backgroundColor: colors.surface,
-    borderRadius: radius.lg,
-    ...cardShadow,
-    overflow: 'hidden',
+  badge: {
+    backgroundColor: colors.primaryBlueSoft,
+    borderRadius: radius.pill,
+    paddingHorizontal: spacing.sm,
+    paddingVertical: spacing.xs,
   },
-  hotelItem: {
+  badgeText: {
+    fontSize: fontSize.sm,
+    fontWeight: '600',
+    color: colors.primaryBlue,
+  },
+  hotelCard: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingVertical: spacing.md,
-    paddingHorizontal: spacing.lg,
-  },
-  hotelItemPressed: {
     backgroundColor: colors.surfaceSecondary,
-  },
-  hotelIconContainer: {
-    width: 36,
-    height: 36,
     borderRadius: radius.md,
-    backgroundColor: '#E3F2FD',
+    padding: spacing.md,
+    gap: spacing.md,
+  },
+  hotelIcon: {
+    width: 44,
+    height: 44,
+    borderRadius: 12,
+    backgroundColor: colors.primaryBlueSoft,
     alignItems: 'center',
     justifyContent: 'center',
-    marginRight: spacing.md,
+  },
+  hotelInfo: {
+    flex: 1,
   },
   hotelName: {
     fontSize: fontSize.base,
-    fontWeight: '500',
+    fontWeight: '600',
     color: colors.textPrimary,
   },
+  locationRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.xs,
+    marginTop: spacing.xs,
+  },
+  locationText: {
+    fontSize: fontSize.sm,
+    color: colors.textSecondary,
+  },
   separator: {
-    height: 1,
-    backgroundColor: colors.border,
-    marginLeft: spacing.lg + 36 + spacing.md, // Align with text
+    height: spacing.sm,
+  },
+  emptyState: {
+    alignItems: 'center',
+    paddingVertical: spacing.xxl,
+  },
+  emptyText: {
+    fontSize: fontSize.base,
+    fontWeight: '500',
+    color: colors.textSecondary,
+    marginTop: spacing.md,
+  },
+  emptySubtext: {
+    fontSize: fontSize.sm,
+    color: colors.textTertiary,
+    marginTop: spacing.xs,
   },
 });

@@ -1,7 +1,6 @@
 /**
  * Type definitions for Staff Home Screen
  */
-
 export interface HotelInfo {
   hotelId: string;
   hotelName: string;

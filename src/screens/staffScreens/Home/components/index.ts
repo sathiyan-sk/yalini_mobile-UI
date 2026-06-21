@@ -1,5 +1,5 @@
 /**
- * Export all Staff Home screen components
+ * Export all Home screen components
  */
 export { StaffHomeHeader } from './StaffHomeHeader';
 export { TodayOverview } from './TodayOverview';

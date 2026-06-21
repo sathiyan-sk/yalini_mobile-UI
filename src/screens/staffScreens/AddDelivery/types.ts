@@ -22,6 +22,7 @@ export type ExpenseCategory = 'FUEL' | 'OTHERS';
  */
 export type SessionStatus = 'ACTIVE' | 'SUBMITTED';
 
+
 /**
  * Hotel item from the master list for dropdown selection.
  */

@@ -114,7 +114,7 @@ const styles = StyleSheet.create({
   container: {
     backgroundColor: colors.surface,
     marginHorizontal: spacing.lg,
-    marginTop: -spacing.lg,
+    marginTop: spacing.sm,
     marginBottom: spacing.md,
     borderRadius: radius.lg,
     padding: spacing.lg,
@@ -126,7 +126,7 @@ const styles = StyleSheet.create({
   },
   infoItem: {
     flex: 1,
-    flexDirection: 'row',
+    flexDirection: 'column',
     alignItems: 'flex-start',
     gap: spacing.xs,
   },

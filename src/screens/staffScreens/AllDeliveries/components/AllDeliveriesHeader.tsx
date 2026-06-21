@@ -24,17 +24,7 @@ export function AllDeliveriesHeader({
 
   return (
     <View style={[styles.container, { paddingTop: insets.top + spacing.md }]}>
-      <View style={styles.leftSection}>
-        {onMenuPress && (
-          <TouchableOpacity
-            style={styles.iconButton}
-            onPress={onMenuPress}
-            activeOpacity={0.7}
-          >
-            <Feather name="menu" size={24} color={colors.surface} />
-          </TouchableOpacity>
-        )}
-      </View>
+
 
       <Text style={styles.title}>All Deliveries</Text>
 
@@ -74,7 +64,7 @@ const styles = StyleSheet.create({
     fontWeight: '700',
     color: colors.surface,
     flex: 1,
-    textAlign: 'center',
+    textAlign: 'left',
   },
   iconButton: {
     padding: spacing.xs,

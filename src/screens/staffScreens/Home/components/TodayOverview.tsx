@@ -94,8 +94,9 @@ export function TodayOverview({ data }: TodayOverviewProps) {
 
 const styles = StyleSheet.create({
   container: {
-    marginHorizontal: spacing.lg,
-    marginTop: -spacing.xl, // Overlap with header
+    marginHorizontal: spacing.md,
+    padding: spacing.sm,
+    margin: spacing.sm,
   },
   sectionTitle: {
     fontSize: fontSize.lg,

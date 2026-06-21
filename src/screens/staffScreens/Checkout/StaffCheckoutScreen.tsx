@@ -1,14 +1,13 @@
 /**
  * StaffCheckoutScreen - Screen for submitting staff's daily session.
- * Shows summary of all deliveries and allows submission.
- * 
- * Features (Placeholder for now):
- * - Summary of all deliveries made
+ * Shows tabular hotel-wise delivery summary and allows submission.
+ *
+ * Features:
+ * - Tabular view of all deliveries grouped by hotel
  * - Total income, expense, and net amount
  * - Submit session button
  * - Navigation to success screen
  */
-
 import React, { useMemo } from 'react';
 import {
   StyleSheet,
@@ -29,14 +28,52 @@ import type { StaffStackParamList } from '../../../types/navigation';
 
 type CheckoutNavigationProp = NativeStackNavigationProp<StaffStackParamList>;
 
+// Type for hotel-wise grouped deliveries
+interface HotelDeliverySummary {
+  hotelId: string;
+  hotelName: string;
+  deliveryCount: number;
+  cansDelivered: number;
+  cansReturned: number;
+  totalIncome: number;
+  totalExpense: number;
+}
+
 export default function StaffCheckoutScreen() {
   const insets = useSafeAreaInsets();
   const navigation = useNavigation<CheckoutNavigationProp>();
-  
   const { session, deliveries, updateSessionStatus } = useDeliveryStore();
 
-  // Calculate summary
-  const summary = useMemo(() => {
+  // Group deliveries by hotel and calculate summary
+  const hotelSummaries = useMemo(() => {
+    const hotelMap = new Map<string, HotelDeliverySummary>();
+
+    deliveries.forEach((delivery) => {
+      const existing = hotelMap.get(delivery.hotelId);
+      if (existing) {
+        existing.deliveryCount += 1;
+        existing.cansDelivered += delivery.cansDelivered;
+        existing.cansReturned += delivery.cansReturned;
+        existing.totalIncome += delivery.receivedIncome;
+        existing.totalExpense += delivery.expenseAmount || 0;
+      } else {
+        hotelMap.set(delivery.hotelId, {
+          hotelId: delivery.hotelId,
+          hotelName: delivery.hotelName,
+          deliveryCount: 1,
+          cansDelivered: delivery.cansDelivered,
+          cansReturned: delivery.cansReturned,
+          totalIncome: delivery.receivedIncome,
+          totalExpense: delivery.expenseAmount || 0,
+        });
+      }
+    });
+
+    return Array.from(hotelMap.values());
+  }, [deliveries]);
+
+  // Calculate grand total
+  const grandTotal = useMemo(() => {
     const totalDeliveries = deliveries.length;
     const totalCansDelivered = deliveries.reduce((sum, d) => sum + d.cansDelivered, 0);
     const totalCansReturned = deliveries.reduce((sum, d) => sum + d.cansReturned, 0);
@@ -75,19 +112,8 @@ export default function StaffCheckoutScreen() {
           style: 'default',
           onPress: () => {
             updateSessionStatus('SUBMITTED');
-            Alert.alert(
-              'Success',
-              'Your session has been submitted successfully!',
-              [
-                {
-                  text: 'OK',
-                  onPress: () => {
-                    // Navigate to submitted successfully screen
-                    navigation.getParent()?.navigate('SubmittedSuccessfully');
-                  },
-                },
-              ]
-            );
+            // Navigate to submitted successfully screen
+            navigation.getParent()?.navigate('SubmittedSuccessfully');
           },
         },
       ]
@@ -111,7 +137,7 @@ export default function StaffCheckoutScreen() {
         showsVerticalScrollIndicator={false}
       >
         {/* Session Info Card */}
-        <View style={styles.card}>
+        <View style={[styles.card, cardShadow]}>
           <View style={styles.cardHeader}>
             <View style={styles.iconCircle}>
               <Feather name="user" size={20} color={colors.primaryBlue} />
@@ -133,94 +159,158 @@ export default function StaffCheckoutScreen() {
           </View>
         </View>
 
-        {/* Delivery Summary Card */}
-        <View style={styles.card}>
-          <Text style={styles.sectionTitle}>Delivery Summary</Text>
-          
-          <View style={styles.statsGrid}>
-            <View style={styles.statItem}>
-              <View style={[styles.statIcon, { backgroundColor: colors.primaryBlueSoft }]}>
-                <MaterialCommunityIcons name="truck-delivery" size={20} color={colors.primaryBlue} />
-              </View>
-              <Text style={styles.statValue}>{summary.totalDeliveries}</Text>
-              <Text style={styles.statLabel}>Deliveries</Text>
-            </View>
-            
-            <View style={styles.statItem}>
-              <View style={[styles.statIcon, { backgroundColor: '#E3F2FD' }]}>
-                <MaterialCommunityIcons name="water" size={20} color="#1976D2" />
-              </View>
-              <Text style={styles.statValue}>{summary.totalCansDelivered}</Text>
-              <Text style={styles.statLabel}>Cans Delivered</Text>
-            </View>
-            
-            <View style={styles.statItem}>
-              <View style={[styles.statIcon, { backgroundColor: '#FFF3E0' }]}>
-                <Feather name="refresh-ccw" size={18} color="#F57C00" />
-              </View>
-              <Text style={styles.statValue}>{summary.totalCansReturned}</Text>
-              <Text style={styles.statLabel}>Cans Returned</Text>
-            </View>
-          </View>
-        </View>
+        {/* Hotel-wise Deliveries Table */}
+        <View style={[styles.card, cardShadow]}>
+          <Text style={styles.sectionTitle}>Hotel-wise Deliveries</Text>
 
-        {/* Financial Summary Card */}
-        <View style={styles.card}>
-          <Text style={styles.sectionTitle}>Financial Summary</Text>
-          
-          <View style={styles.financialRow}>
-            <View style={styles.financialItem}>
-              <Text style={styles.financialLabel}>Total Income</Text>
-              <Text style={[styles.financialValue, { color: '#2E7D32' }]}>
-                ₹{summary.totalIncome.toLocaleString('en-IN')}
+          {/* Table Header */}
+          <View style={styles.tableHeader}>
+            <Text style={[styles.tableHeaderCell, styles.hotelColumn]}>Hotel</Text>
+            <Text style={[styles.tableHeaderCell, styles.numColumn]}>Del.</Text>
+            <Text style={[styles.tableHeaderCell, styles.numColumn]}>Out</Text>
+            <Text style={[styles.tableHeaderCell, styles.numColumn]}>In</Text>
+            <Text style={[styles.tableHeaderCell, styles.amountColumn]}>Amount</Text>
+          </View>
+
+          {/* Table Body */}
+          {hotelSummaries.length > 0 ? (
+            hotelSummaries.map((hotel, index) => (
+              <View
+                key={hotel.hotelId}
+                style={[
+                  styles.tableRow,
+                  index % 2 === 0 && styles.tableRowEven,
+                ]}
+              >
+                <View style={[styles.tableRowEven, styles.hotelColumn]}>
+                  <Text style={styles.hotelName} numberOfLines={1}>
+                    {hotel.hotelName}
+                  </Text>
+                </View>
+                <Text style={[styles.tableCell, styles.numColumn, styles.cellValue]}>
+                  {hotel.deliveryCount}
+                </Text>
+                <Text style={[styles.tableCell, styles.numColumn, styles.cellValue]}>
+                  {hotel.cansDelivered}
+                </Text>
+                <Text style={[styles.tableCell, styles.numColumn, styles.cellValue]}>
+                  {hotel.cansReturned}
+                </Text>
+                <Text style={[styles.tableCell, styles.amountColumn, styles.amountValue]}>
+                  ₹{hotel.totalIncome.toLocaleString()}
+                </Text>
+              </View>
+            ))
+          ) : (
+            <View style={styles.emptyState}>
+              <MaterialCommunityIcons
+                name="truck-delivery-outline"
+                size={48}
+                color={colors.textTertiary}
+              />
+              <Text style={styles.emptyStateText}>No deliveries added yet</Text>
+              <Text style={styles.emptyStateSubtext}>
+                Add deliveries to see them here
               </Text>
             </View>
-            
-            <View style={styles.financialDivider} />
-            
-            <View style={styles.financialItem}>
-              <Text style={styles.financialLabel}>Total Expense</Text>
-              <Text style={[styles.financialValue, { color: '#F44336' }]}>
-                ₹{summary.totalExpense.toLocaleString('en-IN')}
+          )}
+
+          {/* Table Footer - Grand Total */}
+          {hotelSummaries.length > 0 && (
+            <View style={styles.tableFooter}>
+              <Text style={[styles.tableFooterCell, styles.hotelColumn, styles.totalLabel]}>
+                Grand Total
+              </Text>
+              <Text style={[styles.tableFooterCell, styles.numColumn, styles.totalValue]}>
+                {grandTotal.totalDeliveries}
+              </Text>
+              <Text style={[styles.tableFooterCell, styles.numColumn, styles.totalValue]}>
+                {grandTotal.totalCansDelivered}
+              </Text>
+              <Text style={[styles.tableFooterCell, styles.numColumn, styles.totalValue]}>
+                {grandTotal.totalCansReturned}
+              </Text>
+              <Text style={[styles.tableFooterCell, styles.amountColumn, styles.totalAmount]}>
+                ₹{grandTotal.totalIncome.toLocaleString()}
               </Text>
             </View>
-          </View>
-          
-          <View style={styles.netAmountContainer}>
-            <Text style={styles.netAmountLabel}>Net Amount</Text>
-            <Text style={styles.netAmountValue}>
-              ₹{summary.netAmount.toLocaleString('en-IN')}
-            </Text>
-          </View>
+          )}
         </View>
 
-        {/* Status Card */}
-        {session.sessionStatus === 'SUBMITTED' && (
-          <View style={[styles.card, styles.submittedCard]}>
-            <Feather name="check-circle" size={24} color="#2E7D32" />
-            <Text style={styles.submittedText}>Session Already Submitted</Text>
+        {/* Financial Summary */}
+        {hotelSummaries.length > 0 && (
+          <View style={[styles.card, cardShadow]}>
+            <Text style={styles.sectionTitle}>Financial Summary</Text>
+
+            <View style={styles.financialRow}>
+              <View style={styles.financialItem}>
+                <View style={[styles.finIcon, { backgroundColor: '#E8F5E9' }]}>
+                  <Feather name="arrow-down-circle" size={18} color="#4CAF50" />
+                </View>
+                <View>
+                  <Text style={styles.finLabel}>Total Income</Text>
+                  <Text style={[styles.finValue, { color: '#4CAF50' }]}>
+                    ₹{grandTotal.totalIncome.toLocaleString()}
+                  </Text>
+                </View>
+              </View>
+              <View style={styles.financialItem}>
+                <View style={[styles.finIcon, { backgroundColor: '#FFEBEE' }]}>
+                  <Feather name="arrow-up-circle" size={18} color={colors.error} />
+                </View>
+                <View>
+                  <Text style={styles.finLabel}>Total Expense</Text>
+                  <Text style={[styles.finValue, { color: colors.error }]}>
+                    ₹{grandTotal.totalExpense.toLocaleString()}
+                  </Text>
+                </View>
+              </View>
+            </View>
+
+            <View style={styles.netContainer}>
+              <Text style={styles.netLabel}>Net Amount</Text>
+              <Text
+                style={[
+                  styles.netValue,
+                  { color: grandTotal.netAmount >= 0 ? '#4CAF50' : colors.error },
+                ]}
+              >
+                ₹{grandTotal.netAmount.toLocaleString()}
+              </Text>
+            </View>
           </View>
         )}
 
         {/* Submit Button */}
-        <TouchableOpacity
-          style={[styles.submitButton, !canSubmit && styles.submitButtonDisabled]}
-          onPress={handleSubmitSession}
-          activeOpacity={0.8}
-          disabled={!canSubmit}
-        >
-          <Feather name="check-circle" size={22} color={colors.surface} />
-          <Text style={styles.submitButtonText}>Submit Session</Text>
-        </TouchableOpacity>
-
-        {/* Warning */}
-        {!canSubmit && session.sessionStatus === 'ACTIVE' && (
-          <View style={styles.warningContainer}>
-            <Feather name="alert-circle" size={16} color={colors.warning} />
-            <Text style={styles.warningText}>
-              Add at least one delivery to submit
-            </Text>
+        {session.sessionStatus === 'SUBMITTED' ? (
+          <View style={[styles.card, cardShadow, styles.submittedCard]}>
+            <Feather name="check-circle" size={24} color="#4CAF50" />
+            <Text style={styles.submittedText}>Session Already Submitted</Text>
           </View>
+        ) : (
+          <>
+            <TouchableOpacity
+              style={[
+                styles.submitButton,
+                !canSubmit && styles.submitButtonDisabled,
+              ]}
+              onPress={handleSubmitSession}
+              disabled={!canSubmit}
+              activeOpacity={0.8}
+            >
+              <Feather name="check-circle" size={20} color={colors.surface} />
+              <Text style={styles.submitButtonText}>Submit Session</Text>
+            </TouchableOpacity>
+
+            {!canSubmit && deliveries.length === 0 && (
+              <View style={styles.warningContainer}>
+                <Feather name="info" size={14} color={colors.textSecondary} />
+                <Text style={styles.warningText}>
+                  Add at least one delivery to submit
+                </Text>
+              </View>
+            )}
+          </>
         )}
       </ScrollView>
     </View>
@@ -233,19 +323,19 @@ const styles = StyleSheet.create({
     backgroundColor: colors.surfaceSecondary,
   },
   header: {
-    backgroundColor: colors.headerDark,
     paddingHorizontal: spacing.lg,
-    paddingBottom: spacing.xl,
+    paddingBottom: spacing.lg,
+    backgroundColor: colors.headerDark,
   },
   headerTitle: {
     fontSize: fontSize.xxl,
     fontWeight: '700',
     color: colors.surface,
-    marginBottom: spacing.xs,
   },
   headerSubtitle: {
-    fontSize: fontSize.base,
-    color: 'rgba(255, 255, 255, 0.8)',
+    fontSize: fontSize.sm,
+    color: 'rgba(255, 255, 255, 0.7)',
+    marginTop: spacing.xs,
   },
   scrollView: {
     flex: 1,
@@ -257,29 +347,27 @@ const styles = StyleSheet.create({
     backgroundColor: colors.surface,
     borderRadius: radius.lg,
     padding: spacing.lg,
-    marginBottom: spacing.md,
-    ...cardShadow,
+    marginBottom: spacing.lg,
   },
   cardHeader: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: spacing.md,
+    gap: spacing.md,
   },
   iconCircle: {
     width: 44,
     height: 44,
     borderRadius: 22,
     backgroundColor: colors.primaryBlueSoft,
-    justifyContent: 'center',
     alignItems: 'center',
-    marginRight: spacing.md,
+    justifyContent: 'center',
   },
   cardHeaderText: {
     flex: 1,
   },
   cardTitle: {
     fontSize: fontSize.lg,
-    fontWeight: '700',
+    fontWeight: '600',
     color: colors.textPrimary,
   },
   cardSubtitle: {
@@ -289,7 +377,11 @@ const styles = StyleSheet.create({
   },
   sessionDetails: {
     flexDirection: 'row',
-    gap: spacing.lg,
+    justifyContent: 'space-around',
+    marginTop: spacing.md,
+    paddingTop: spacing.md,
+    borderTopWidth: 1,
+    borderTopColor: colors.border,
   },
   detailRow: {
     flexDirection: 'row',
@@ -302,60 +394,134 @@ const styles = StyleSheet.create({
   },
   sectionTitle: {
     fontSize: fontSize.lg,
-    fontWeight: '700',
+    fontWeight: '600',
     color: colors.textPrimary,
-    marginBottom: spacing.lg,
+    marginBottom: spacing.md,
   },
-  statsGrid: {
+  // Table styles
+  tableHeader: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
+    backgroundColor: colors.headerDark,
+    borderRadius: radius.sm,
+    paddingVertical: spacing.sm,
+    paddingHorizontal: spacing.sm,
+    marginBottom: spacing.xs,
   },
-  statItem: {
+  tableHeaderCell: {
+    fontSize: fontSize.xs,
+    fontWeight: '600',
+    color: colors.surface,
+    textAlign: 'center',
+  },
+  tableRow: {
+    flexDirection: 'row',
+    paddingVertical: spacing.sm,
+    paddingHorizontal: spacing.sm,
+    borderBottomWidth: 1,
+    borderBottomColor: colors.border,
     alignItems: 'center',
+  },
+  tableRowEven: {
+    backgroundColor: colors.surfaceSecondary,
+  },
+  tableCell: {
+    fontSize: fontSize.sm,
+    color: colors.textPrimary,
+    textAlign: 'center',
+  },
+  hotelColumn: {
+    flex: 2,
+    textAlign: 'left',
+  },
+  numColumn: {
     flex: 1,
+    textAlign: 'center',
   },
-  statIcon: {
-    width: 44,
-    height: 44,
-    borderRadius: radius.md,
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginBottom: spacing.sm,
+  amountColumn: {
+    flex: 1.5,
+    textAlign: 'right',
   },
-  statValue: {
-    fontSize: fontSize.xl,
-    fontWeight: '700',
+  hotelName: {
+    fontSize: fontSize.sm,
+    fontWeight: '500',
     color: colors.textPrimary,
   },
-  statLabel: {
-    fontSize: fontSize.xs,
-    color: colors.textSecondary,
-    marginTop: 2,
+  cellValue: {
+    fontSize: fontSize.sm,
+    color: colors.textPrimary,
   },
+  amountValue: {
+    fontSize: fontSize.sm,
+    fontWeight: '600',
+    color: colors.successDark,
+  },
+  tableFooter: {
+    flexDirection: 'row',
+    backgroundColor: colors.primaryBlueSoft,
+    borderRadius: radius.sm,
+    paddingVertical: spacing.sm,
+    paddingHorizontal: spacing.sm,
+    marginTop: spacing.sm,
+  },
+  tableFooterCell: {
+    fontSize: fontSize.sm,
+    fontWeight: '700',
+    color: colors.textPrimary,
+    textAlign: 'center',
+  },
+  totalLabel: {
+    textAlign: 'left',
+    color: colors.primaryBlue,
+  },
+  totalValue: {
+    color: colors.primaryBlue,
+  },
+  totalAmount: {
+    textAlign: 'right',
+    color: colors.primaryBlue,
+  },
+  emptyState: {
+    alignItems: 'center',
+    paddingVertical: spacing.xxl,
+  },
+  emptyStateText: {
+    fontSize: fontSize.base,
+    fontWeight: '500',
+    color: colors.textSecondary,
+    marginTop: spacing.md,
+  },
+  emptyStateSubtext: {
+    fontSize: fontSize.sm,
+    color: colors.textTertiary,
+    marginTop: spacing.xs,
+  },
+  // Financial summary styles
   financialRow: {
     flexDirection: 'row',
-    alignItems: 'center',
+    justifyContent: 'space-around',
     marginBottom: spacing.lg,
   },
   financialItem: {
-    flex: 1,
+    flexDirection: 'row',
     alignItems: 'center',
+    gap: spacing.sm,
   },
-  financialDivider: {
-    width: 1,
-    height: 40,
-    backgroundColor: colors.border,
+  finIcon: {
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
-  financialLabel: {
+  finLabel: {
     fontSize: fontSize.sm,
     color: colors.textSecondary,
-    marginBottom: spacing.xs,
   },
-  financialValue: {
-    fontSize: fontSize.xl,
+  finValue: {
+    fontSize: fontSize.lg,
     fontWeight: '700',
   },
-  netAmountContainer: {
+  netContainer: {
     backgroundColor: colors.surfaceSecondary,
     borderRadius: radius.md,
     padding: spacing.md,
@@ -363,15 +529,14 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
   },
-  netAmountLabel: {
+  netLabel: {
     fontSize: fontSize.base,
     fontWeight: '600',
     color: colors.textPrimary,
   },
-  netAmountValue: {
+  netValue: {
     fontSize: fontSize.xxl,
     fontWeight: '700',
-    color: '#2E7D32',
   },
   submittedCard: {
     flexDirection: 'row',
@@ -382,7 +547,7 @@ const styles = StyleSheet.create({
   submittedText: {
     fontSize: fontSize.base,
     fontWeight: '600',
-    color: '#2E7D32',
+    color: '#4CAF50',
   },
   submitButton: {
     flexDirection: 'row',

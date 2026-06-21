@@ -2,7 +2,6 @@
  * Central design tokens for the app - Extended for Daily Records screens.
  * Colors aligned with the design specifications.
  */
-
 export const colors = {
   // Surfaces
   surface: "#FFFFFF",
@@ -36,7 +35,7 @@ export const colors = {
   errorSoft: "#FFEBEE",
   info: "#1E88E5",
   infoSoft: "#E3F2FD",
-    
+
   // Vehicle Status Colors
   running: "#22C55E",
   runningSoft: "#DCFCE7",
