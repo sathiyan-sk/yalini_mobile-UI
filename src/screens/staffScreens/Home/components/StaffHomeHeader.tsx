@@ -19,6 +19,8 @@ interface StaffHomeHeaderProps {
 export function StaffHomeHeader({ staffName, greeting, onLogout }: StaffHomeHeaderProps) {
   const insets = useSafeAreaInsets();
 
+  const StaffFirstName=staffName.split(" ")[0]; // Extract first name from full name
+
   return (
     <LinearGradient
       colors={[colors.headerDark, '#303F9F']}
@@ -29,7 +31,7 @@ export function StaffHomeHeader({ staffName, greeting, onLogout }: StaffHomeHead
       <View style={styles.content}>
         <View style={styles.textContainer}>
           <Text style={styles.greeting}>{greeting}</Text>
-          <Text style={styles.staffName}>{staffName}</Text>
+          <Text style={styles.staffName}>{StaffFirstName}</Text>
         </View>
         <TouchableOpacity
           style={styles.logoutButton}

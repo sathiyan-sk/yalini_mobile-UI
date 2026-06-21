@@ -18,6 +18,7 @@ import type { BottomTabNavigationProp } from "@react-navigation/bottom-tabs";
 import type { NativeStackNavigationProp } from "@react-navigation/native-stack";
 
 import { colors, spacing, fontSize } from "../../../theme";
+import { useAuthStore } from "../../../store/authStore";
 import { getGreeting } from "../../../services/driverService";
 import { useTripStore } from "../../../store/tripStore";
 import type { DriverTabParamList, AllTripsStackParamList } from "../../../types/navigation";
@@ -42,6 +43,7 @@ const BACKGROUND_COLOR = colors.surfaceSecondary;
 export default function DriverHomeScreen() {
   const insets = useSafeAreaInsets();
   const navigation = useNavigation<NavigationProp>();
+  const signOut = useAuthStore((state) => state.signOut);
 
   // Get data from tripStore
   const {
@@ -54,6 +56,7 @@ export default function DriverHomeScreen() {
 
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [greeting, setGreeting] = useState(getGreeting());
+  const [sessionLoading, setSessionLoading] = useState(true);
 
   // Update greeting periodically
   useEffect(() => {
@@ -71,10 +74,9 @@ export default function DriverHomeScreen() {
     setIsRefreshing(false);
   }, []);
 
-  // Navigation handlers
-  const handleNotificationPress = () => {
-    console.log("Notifications pressed");
-  };
+const handleLogout = () => {
+    signOut();
+  }
 
   const handleAddTrip = () => {
     navigation.navigate("AddTrip");
@@ -126,8 +128,7 @@ export default function DriverHomeScreen() {
       <HomeHeader
         driverName={session.driverName}
         greeting={greeting}
-        notificationCount={2}
-        onNotificationPress={handleNotificationPress}
+        onLogout={handleLogout}
       />
 
       {/* Scrollable Content */}
