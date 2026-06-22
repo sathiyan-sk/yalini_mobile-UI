@@ -2,11 +2,14 @@
  * Trip Store - Zustand store for managing trips and expenses across screens
  * Handles the workflow: AddTrip -> AddExpense (optional) -> AllTrips -> EditTrip -> Checkout -> Success
  * Updated with session submission support
+ *  * Uses centralized driverConfig for consistent mock data with admin module.
+
  */
 
 import { create } from 'zustand';
 import type { Trip, PaymentMode, TripType, SessionSubmissionData } from '../types/driver';
 import { submitDriverSession } from '../services/driverService';
+import { DEMO_TRIP_TEMPLATES, DRIVER_CONFIG } from '../services/mockData/driverConfig';
 
 export interface TripExpense {
   fuel: number;
@@ -98,76 +101,32 @@ const getCurrentTime = () => {
 //  Initial session state - Uses seed data IDs for proper data linking
 // When driver submits, this creates a record that admin can see
 const initialSession: SessionInfo = {
-  serviceName: 'City Taxi',
-  driverName: 'Ramesh Kumar',
-  vehicleNumber: 'TN01AB1234',
+  serviceName: DRIVER_CONFIG.businessName,
+  driverName: DRIVER_CONFIG.driverName,
+  vehicleNumber: DRIVER_CONFIG.vehicleNumber,
   sessionStatus: 'Day Started',
   sessionDate: getCurrentDate(),
-  sessionTime: '08:05 AM',
+  sessionTime: DRIVER_CONFIG.defaultSessionTime,
   isActive: true,
   sessionId: `SESSION_${Date.now()}`,
-  driverId: 'emp_seed_ramesh', 
-  vehicleId: 'veh_seed_swift_dzire', 
+  driverId: DRIVER_CONFIG.driverId,
+  vehicleId: DRIVER_CONFIG.vehicleId,
 };
 
-// Sample initial trips - uses dynamic dates for consistency
-const initialTrips: TripWithExpense[] = [
-  {
-    id: 'trip_001',
-    tripNumber: 1,
-    tripType: 'vendor',
-    from: 'Coimbatore',
-    to: 'Airport',
-    amount: 650,
-    paymentMode: 'cash',
-    date: getCurrentDate(),
-    time: '08:30 AM',
-    hasExpense: true,
-    totalExpense: 200,
-    expense: {
-      fuel: 110,
-      toll: 40,
-      food: 30,
-      other: 20,
-      notes: '',
-      total: 200,
-    },
-  },
-  {
-    id: 'trip_002',
-    tripNumber: 2,
-    tripType: 'private',
-    from: 'Airport',
-    to: 'Peelamedu',
-    amount: 900,
-    paymentMode: 'cash',
-    date: getCurrentDate(),
-    time: '10:45 AM',
-    hasExpense: false,
-    totalExpense: 0,
-  },
-  {
-    id: 'trip_003',
-    tripNumber: 3,
-    tripType: 'vendor',
-    from: 'Peelamedu',
-    to: 'RS Puram',
-    amount: 900,
-    paymentMode: 'online',
-    date: getCurrentDate(),
-    time: '01:15 PM',
-    hasExpense: true,
-    totalExpense: 120,
-    expense: {
-      fuel: 60,
-      toll: 20,
-      food: 25,
-      other: 15,
-      notes: '',
-      total: 120,
-    },
-  },
-];
+// Sample initial trips - uses centralized DEMO_TRIP_TEMPLATES with dynamic dates
+const initialTrips: TripWithExpense[] = DEMO_TRIP_TEMPLATES.map((template, index) => ({
+  id: `trip_00${index + 1}`,
+  tripNumber: index + 1,
+  tripType: template.tripType,
+  from: template.from,
+  to: template.to,
+  amount: template.amount,
+  paymentMode: template.paymentMode,
+  time: template.time,
+  hasExpense: template.hasExpense,
+  totalExpense: template.totalExpense,
+  ...(template.expense && { expense: { ...template.expense } }),
+}));
 
 // Calculate totals from trips
 const calculateTotals = (trips: TripWithExpense[]) => {

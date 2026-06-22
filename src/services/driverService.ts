@@ -11,6 +11,7 @@
  */
 
 import { USE_MOCK, API_CONFIG } from "./featureFlags";
+import { DRIVER_CONFIG } from "./mockData/driverConfig";
 import {
   getEmployeeById,
   getVehicleById,
@@ -116,32 +117,32 @@ export async function getDriverHomeData(): Promise<DriverHomeData> {
   if (USE_MOCK) {
     await simulateLatency();
     
-    // Default demo driver (Ramesh Kumar from seed data)
-    const demoDriverId = 'emp_seed_ramesh';
+    // Default demo driver from centralized config
+    const demoDriverId = DRIVER_CONFIG.driverId;
     const driverInfo = await getDriverInfo(demoDriverId);
     
     if (driverInfo) {
       return driverInfo;
     }
     
-    // Fallback if demo driver not found
+    // Fallback using centralized config
     return {
       driver: {
-        id: 'emp_seed_ramesh',
-        name: 'Ramesh Kumar',
-        businessName: 'City Taxi',
-        businessType: 'taxi',
+        id: DRIVER_CONFIG.driverId,
+        name: DRIVER_CONFIG.driverName,
+        businessName: DRIVER_CONFIG.businessName,
+        businessType: DRIVER_CONFIG.businessType,
         role: 'Driver',
       },
       assignment: {
-        vehicleId: 'veh_seed_swift_dzire',
-        vehicleName: 'Swift Dzire',
-        vehicleNumber: 'TN01AB1234',
+        vehicleId: DRIVER_CONFIG.vehicleId,
+        vehicleName: DRIVER_CONFIG.vehicleName,
+        vehicleNumber: DRIVER_CONFIG.vehicleNumber,
         isAssigned: true,
       },
       sessionStatus: 'OPEN',
       sessionDate: formatDisplayDate(todayISODate()),
-      sessionStartTime: '08:05 AM',
+      sessionStartTime: DRIVER_CONFIG.defaultSessionTime,
       todayOverview: {
         totalTrips: 0,
         totalIncome: 0,
@@ -166,21 +167,21 @@ export async function getDriverHomeDataWithTrips(): Promise<DriverHomeData> {
     
     return {
       driver: {
-        id: 'emp_seed_ramesh',
-        name: 'Ramesh Kumar',
-        businessName: 'City Taxi',
-        businessType: 'taxi',
+        id: DRIVER_CONFIG.driverId,
+        name: DRIVER_CONFIG.driverName,
+        businessName: DRIVER_CONFIG.businessName,
+        businessType: DRIVER_CONFIG.businessType,
         role: 'Driver',
       },
       assignment: {
-        vehicleId: 'veh_seed_swift_dzire',
-        vehicleName: 'Swift Dzire',
-        vehicleNumber: 'TNN01AB1234',
+        vehicleId: DRIVER_CONFIG.vehicleId,
+        vehicleName: DRIVER_CONFIG.vehicleName,
+        vehicleNumber: DRIVER_CONFIG.vehicleNumber,
         isAssigned: true,
       },
       sessionStatus: 'OPEN',
       sessionDate: formatDisplayDate(todayISODate()),
-      sessionStartTime: '08:05 AM',
+      sessionStartTime: DRIVER_CONFIG.defaultSessionTime,
       todayOverview: {
         totalTrips: 5,
         totalIncome: 3250,
@@ -416,7 +417,7 @@ export async function getStartDayData(): Promise<StartDayData> {
   if (USE_MOCK) {
     await simulateLatency()
 
-    const demoDriverId    = "emp_seed_ramesh"
+    const demoDriverId    = DRIVER_CONFIG.driverId
     const employee        = await getEmployeeById(demoDriverId)
     const vehicles        = await getVehicles()
     const assignedVehicle = vehicles.find(
@@ -443,19 +444,19 @@ export async function getStartDayData(): Promise<StartDayData> {
       }
     }
 
-    // fallback
+    // fallback using centralized config
     return {
       driver: {
-        id:           "emp_seed_ramesh",
-        name:         "Ramesh Kumar",
-        businessName: "City Taxi",
-        businessType: "taxi" as const,
+        id:           DRIVER_CONFIG.driverId,
+        name:         DRIVER_CONFIG.driverName,
+        businessName: DRIVER_CONFIG.businessName,
+        businessType: DRIVER_CONFIG.businessType,
         role:         "Driver",
       },
       assignment: {
-        vehicleId:     "veh_seed_swift_dzire",
-        vehicleName:   "Swift Dzire",
-        vehicleNumber: "TN01AB1234",
+        vehicleId:     DRIVER_CONFIG.vehicleId,
+        vehicleName:   DRIVER_CONFIG.vehicleName,
+        vehicleNumber: DRIVER_CONFIG.vehicleNumber,
         isAssigned:    true,
       },
     }
