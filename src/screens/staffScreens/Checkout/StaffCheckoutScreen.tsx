@@ -8,7 +8,7 @@
  * - Submit session button
  * - Navigation to success screen
  */
-import React, { useMemo } from 'react';
+import React, { useMemo, useState } from 'react';
 import {
   StyleSheet,
   View,
@@ -16,6 +16,7 @@ import {
   ScrollView,
   TouchableOpacity,
   Alert,
+  ActivityIndicator,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Feather, MaterialCommunityIcons } from '@expo/vector-icons';
@@ -24,6 +25,7 @@ import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 
 import { colors, spacing, fontSize, radius, cardShadow } from '../../../theme';
 import { useDeliveryStore } from '../../../store/deliveryStore';
+import { submitStaffSession } from '../../../services/deliveryService';
 import type { StaffStackParamList } from '../../../types/navigation';
 
 type CheckoutNavigationProp = NativeStackNavigationProp<StaffStackParamList>;
@@ -42,8 +44,8 @@ interface HotelDeliverySummary {
 export default function StaffCheckoutScreen() {
   const insets = useSafeAreaInsets();
   const navigation = useNavigation<CheckoutNavigationProp>();
-  const { session, deliveries, updateSessionStatus } = useDeliveryStore();
-
+  const { session, deliveries, updateSessionStatus, reset } = useDeliveryStore();
+  const [isSubmitting, setIsSubmitting] = useState(false);
   // Group deliveries by hotel and calculate summary
   const hotelSummaries = useMemo(() => {
     const hotelMap = new Map<string, HotelDeliverySummary>();
@@ -91,7 +93,7 @@ export default function StaffCheckoutScreen() {
     };
   }, [deliveries]);
 
-  const canSubmit = deliveries.length > 0 && session.sessionStatus === 'ACTIVE';
+  const canSubmit = deliveries.length > 0 && session.sessionStatus === 'ACTIVE' && !isSubmitting;
 
   const handleSubmitSession = () => {
     if (!canSubmit) {
@@ -110,10 +112,33 @@ export default function StaffCheckoutScreen() {
         {
           text: 'Submit',
           style: 'default',
-          onPress: () => {
+          onPress: async () => {
+            setIsSubmitting(true);
+            try {
+              // FIX: Submit to central store so Admin can see the record
+              const result = await submitStaffSession({
+                staffId: session.id || 'emp_seed_mani',
+                staffName: session.staffName,
+                deliveries: deliveries,
+                totalIncome: grandTotal.totalIncome,
+                totalExpense: grandTotal.totalExpense,
+                netAmount: grandTotal.netAmount,
+              });
+
+              if (result.success) {
+                // Update local session status
             updateSessionStatus('SUBMITTED');
             // Navigate to submitted successfully screen
             navigation.getParent()?.navigate('SubmittedSuccessfully');
+                          } else {
+                Alert.alert('Submission Failed', result.message);
+              }
+            } catch (error) {
+              console.error('Session submission error:', error);
+              Alert.alert('Error', 'Failed to submit session. Please try again.');
+            } finally {
+              setIsSubmitting(false);
+            }
           },
         },
       ]

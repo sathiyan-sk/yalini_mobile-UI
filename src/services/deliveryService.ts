@@ -12,8 +12,14 @@
  */
 
 import { USE_MOCK, API_CONFIG } from './featureFlags';
-import { getHotels, generateId } from './mockData';
-import type { MockHotel } from './mockData/types';
+import { 
+  getHotels, 
+  generateId, 
+  todayISODate,
+  createWaterDeliveryRecord,
+  getEmployeeById,
+} from './mockData';
+import type { MockHotel, MockWaterDeliveryRecord, HotelDelivery } from './mockData/types';
 import type {
   HotelOption,
   DeliveryRecord,
@@ -21,12 +27,14 @@ import type {
   DeliverySessionData,
   SessionStatus,
 } from '../screens/staffScreens/AddDelivery/types';
-/**
- * Converts MockHotel from central store to HotelOption for delivery screens.
- * This ensures type consistency between admin hotel management and staff delivery.
- * @param hotel - MockHotel from central store
- * @returns HotelOption for delivery screens
- */
+
+/** Staff configuration - defaults to emp_seed_mani for demo */
+const STAFF_CONFIG = {
+  staffId: 'emp_seed_mani',
+  staffName: 'Mani Kumar',
+  businessName: 'Yalini Minerals',
+};
+
 function toHotelOption(hotel: MockHotel): HotelOption {
   return {
     id: hotel.id,
@@ -368,4 +376,229 @@ export async function deleteDeliveryRecord(id: string): Promise<void> {
 export function resetDeliverySession(): void {
   deliveryRecords = [];
   currentSession = null;
+}
+// Avatar colors for staff records (created same as from driver module)
+const AVATAR_COLORS = [
+  '#1E88E5', // Blue
+  '#7C3AED', // Purple
+  '#059669', // Green
+  '#EA580C', // Orange
+  '#8B5CF6', // Vivid Purple
+  '#0D9488', // Teal
+  '#0891B2', // Cyan
+];
+
+function getRandomAvatarColor(): string {
+  return AVATAR_COLORS[Math.floor(Math.random() * AVATAR_COLORS.length)];
+}
+
+/**
+ * Submission data for staff session
+ */
+export interface StaffSessionSubmissionData {
+  /** Staff/employee ID */
+  staffId: string;
+  /** Staff name */
+  staffName: string;
+  /** List of delivery records from the session */
+  deliveries: DeliveryRecord[];
+  /** Total income received */
+  totalIncome: number;
+  /** Total expenses incurred */
+  totalExpense: number;
+  /** Net amount (income - expense) */
+  netAmount: number;
+}
+
+/**
+ * Response from session submission
+ */
+export interface StaffSessionSubmissionResponse {
+  success: boolean;
+  message: string;
+  submissionId?: string;
+  submittedAt?: string;
+}
+
+/**
+ * Submit staff delivery session to the central store.
+ * This is the KEY function that creates a MockWaterDeliveryRecord in the
+ * central store, making the submission visible to Admin's Records screen.
+ * 
+ * BACKEND INTEGRATION:
+ * Replace with: POST /api/v1/staff/session/submit
+ * 
+ * @param data - Session submission data including all deliveries
+ * @returns Promise resolving to submission response
+ */
+export async function submitStaffSession(
+  data: StaffSessionSubmissionData
+): Promise<StaffSessionSubmissionResponse> {
+  if (USE_MOCK) {
+    await simulateLatency();
+
+    // Get staff/employee information
+    let staffName = data.staffName || STAFF_CONFIG.staffName;
+    const staffId = data.staffId || STAFF_CONFIG.staffId;
+
+    // Try to get actual employee name from store
+    const employee = await getEmployeeById(staffId);
+    if (employee) {
+      staffName = employee.fullName;
+    }
+
+    // Convert delivery records to HotelDelivery format
+    // Group by hotel and aggregate
+    const hotelMap = new Map<string, HotelDelivery>();
+
+    data.deliveries.forEach((delivery, index) => {
+      const existing = hotelMap.get(delivery.hotelId);
+      if (existing) {
+        // Aggregate with existing hotel entry
+        existing.totalCans += delivery.loadedCans;
+        existing.deliveredCans += delivery.cansDelivered;
+        existing.returnedCans += delivery.cansReturned;
+        existing.outstandingCans += delivery.outstandingCans;
+        existing.income += delivery.receivedIncome;
+        existing.expense += delivery.expenseAmount || 0;
+        existing.profit = existing.income - existing.expense;
+      } else {
+        // Create new hotel entry
+        hotelMap.set(delivery.hotelId, {
+          id: `hoteldelivery_${delivery.hotelId}_${Date.now()}_${index}`,
+          hotelName: delivery.hotelName,
+          location: '', // Location info not captured in delivery form
+          totalCans: delivery.loadedCans,
+          deliveredCans: delivery.cansDelivered,
+          returnedCans: delivery.cansReturned,
+          outstandingCans: delivery.outstandingCans,
+          income: delivery.receivedIncome,
+          expense: delivery.expenseAmount || 0,
+          profit: delivery.receivedIncome - (delivery.expenseAmount || 0),
+        });
+      }
+    });
+
+    const hotelDeliveries = Array.from(hotelMap.values());
+
+    // Calculate totals
+    const totals = hotelDeliveries.reduce(
+      (acc, hotel) => ({
+        totalHotels: acc.totalHotels + 1,
+        totalCans: acc.totalCans + hotel.totalCans,
+        totalDelivered: acc.totalDelivered + hotel.deliveredCans,
+        totalReturned: acc.totalReturned + hotel.returnedCans,
+        totalOutstanding: acc.totalOutstanding + hotel.outstandingCans,
+        totalIncome: acc.totalIncome + hotel.income,
+        totalExpense: acc.totalExpense + hotel.expense,
+        totalProfit: acc.totalProfit + hotel.profit,
+      }),
+      {
+        totalHotels: 0,
+        totalCans: 0,
+        totalDelivered: 0,
+        totalReturned: 0,
+        totalOutstanding: 0,
+        totalIncome: 0,
+        totalExpense: 0,
+        totalProfit: 0,
+      }
+    );
+
+    // Create the water delivery record for central store
+    const recordData: Omit<MockWaterDeliveryRecord, 'id'> = {
+      deliveryPersonName: staffName,
+      employeeId: staffId,
+      date: todayISODate(),
+      status: 'submitted',
+      avatarColor: getRandomAvatarColor(),
+      ...totals,
+      hotelDeliveries,
+    };
+
+    // Save to central store - Admin will see this immediately!
+    const createdRecord = await createWaterDeliveryRecord(recordData);
+
+    // Clear local session data after successful submission
+    deliveryRecords = [];
+
+    return {
+      success: true,
+      message: 'Session submitted successfully',
+      submissionId: createdRecord.id,
+      submittedAt: new Date().toISOString(),
+    };
+  }
+
+  // Real API call
+  const response = await fetch(`${API_CONFIG.BASE_URL}${API_CONFIG.VERSION}/staff/session/submit`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(data),
+  });
+
+  if (!response.ok) {
+    const error = await response.json().catch(() => ({ message: 'Submission failed' }));
+    return {
+      success: false,
+      message: error.message || 'Failed to submit session',
+    };
+  }
+
+  return response.json();
+}
+
+/**
+ * Get staff session for a specific employee ID (used by StartDay screen).
+ * Uses centralized staff config.
+ */
+export async function getStaffHomeData() {
+  if (USE_MOCK) {
+    await simulateLatency();
+
+    const employee = await getEmployeeById(STAFF_CONFIG.staffId);
+    
+    if (employee) {
+      return {
+        staff: {
+          id: employee.id,
+          name: employee.fullName,
+          businessName: employee.businessName,
+          businessType: employee.businessType,
+          role: 'Staff',
+        },
+        sessionStatus: 'OPEN',
+        sessionDate: formatDisplayDate(todayISODate()),
+      };
+    }
+
+    // Fallback to config
+    return {
+      staff: {
+        id: STAFF_CONFIG.staffId,
+        name: STAFF_CONFIG.staffName,
+        businessName: STAFF_CONFIG.businessName,
+        businessType: 'water_delivery',
+        role: 'Staff',
+      },
+      sessionStatus: 'OPEN',
+      sessionDate: formatDisplayDate(todayISODate()),
+    };
+  }
+
+  const response = await fetch(`${API_CONFIG.BASE_URL}${API_CONFIG.VERSION}/staff/home`);
+  if (!response.ok) throw new Error('Failed to fetch staff home data');
+  return response.json();
+}
+
+/**
+ * Format date for display (e.g., \"22 Jun 2026\")
+ */
+function formatDisplayDate(isoDate: string): string {
+  const date = new Date(isoDate);
+  const day = date.getDate();
+  const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+  const month = months[date.getMonth()];
+  const year = date.getFullYear();
+  return `${day} ${month} ${year}`;
 }
