@@ -7,7 +7,7 @@
  */
 
 import { create } from 'zustand';
-import type { Trip, PaymentMode, TripType, SessionSubmissionData } from '../types/driver';
+import type { Trip, SessionSubmissionData } from '../types/driver';
 import { submitDriverSession } from '../services/driverService';
 import { DEMO_TRIP_TEMPLATES, DRIVER_CONFIG } from '../services/mockData/driverConfig';
 
@@ -114,19 +114,24 @@ const initialSession: SessionInfo = {
 };
 
 // Sample initial trips - uses centralized DEMO_TRIP_TEMPLATES with dynamic dates
-const initialTrips: TripWithExpense[] = DEMO_TRIP_TEMPLATES.map((template, index) => ({
-  id: `trip_00${index + 1}`,
-  tripNumber: index + 1,
-  tripType: template.tripType,
-  from: template.from,
-  to: template.to,
-  amount: template.amount,
-  paymentMode: template.paymentMode,
-  time: template.time,
-  hasExpense: template.hasExpense,
-  totalExpense: template.totalExpense,
-  ...(template.expense && { expense: { ...template.expense } }),
-}));
+const initialTrips: TripWithExpense[] = DEMO_TRIP_TEMPLATES.map((template, index) => {
+  const expenseData = 'expense' in template ? { expense: { ...template.expense } } : {};
+
+  return {
+    id: `trip_00${index + 1}`,
+    tripNumber: index + 1,
+    tripType: template.tripType,
+    from: template.from,
+    to: template.to,
+    amount: template.amount,
+    paymentMode: template.paymentMode,
+    date: getCurrentDate(),
+    time: template.time,
+    hasExpense: template.hasExpense,
+    totalExpense: template.totalExpense,
+    ...expenseData,
+  };
+});
 
 // Calculate totals from trips
 const calculateTotals = (trips: TripWithExpense[]) => {

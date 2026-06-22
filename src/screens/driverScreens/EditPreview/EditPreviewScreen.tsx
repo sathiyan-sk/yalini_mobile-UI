@@ -27,24 +27,17 @@ import {
   ExpenseSummaryCard,
   ActionButtons,
 } from './components';
-import { useTripStore, TripWithExpense, TripExpense } from '../../../store/tripStore';
+import { useTripStore, TripWithExpense } from '../../../store/tripStore';
 import type { AllTripsStackParamList } from '../../../types/navigation';
 import type { EditTripFormData, PaymentMode } from '../../../types/driver';
+import { DEFAULT_EXPENSE } from '../../../services/mockData/driverConfig';
+
 
 const BACKGROUND_COLOR = colors.surfaceSecondary;
 
 type EditPreviewNavigationProp = NativeStackNavigationProp<AllTripsStackParamList, 'EditPreview'>;
 type EditPreviewRouteProp = RouteProp<AllTripsStackParamList, 'EditPreview'>;
 
-// Default expense data when no expense exists
-const DEFAULT_EXPENSE: TripExpense = {
-  fuel: 0,
-  toll: 0,
-  food: 0,
-  other: 0,
-  notes: '',
-  total: 0,
-};
 
 export default function EditPreviewScreen() {
   const insets = useSafeAreaInsets();
