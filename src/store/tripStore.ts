@@ -95,18 +95,19 @@ const getCurrentTime = () => {
   return `${hours}:${minutes} ${ampm}`;
 };
 
-// Initial session state
+//  Initial session state - Uses seed data IDs for proper data linking
+// When driver submits, this creates a record that admin can see
 const initialSession: SessionInfo = {
-  serviceName: 'City Taxi Service',
+  serviceName: 'City Taxi',
   driverName: 'Ramesh Kumar',
-  vehicleNumber: 'TN 01 AB 1234',
+  vehicleNumber: 'TN01AB1234',
   sessionStatus: 'Day Started',
   sessionDate: getCurrentDate(),
   sessionTime: '08:05 AM',
   isActive: true,
   sessionId: `SESSION_${Date.now()}`,
-  driverId: 'DRIVER_001',
-  vehicleId: 'VEHICLE_001',
+  driverId: 'emp_seed_ramesh', 
+  vehicleId: 'veh_seed_swift_dzire', 
 };
 
 // Sample initial trips (matching the mockData)

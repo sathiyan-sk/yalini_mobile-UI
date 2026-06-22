@@ -322,6 +322,78 @@ export async function getDriverRecordsByDate(date: string): Promise<MockDriverRe
   return store.driverRecords.filter(r => r.date === date);
 }
 
+export async function getDriverRecordsByEmployeeId(employeeId: string): Promise<MockDriverRecord[]> {
+  await simulateLatency();
+  return store.driverRecords.filter(r => r.employeeId === employeeId);
+}
+
+/**
+ * Create a new driver record (called when driver submits their day)
+ * This makes the submission visible to admin immediately
+ */
+export async function createDriverRecord(
+  record: Omit<MockDriverRecord, 'id'>
+): Promise<MockDriverRecord> {
+  await simulateLatency();
+  
+  // Check if a record already exists for this employee on this date
+  const existingIndex = store.driverRecords.findIndex(
+    r => r.employeeId === record.employeeId && r.date === record.date
+  );
+  
+  if (existingIndex !== -1) {
+    // Update existing record instead of creating new one
+    const updated = { ...store.driverRecords[existingIndex], ...record };
+    store.driverRecords = store.driverRecords.map((r, i) => 
+      i === existingIndex ? updated : r
+    );
+    return updated;
+  }
+  
+  const newRecord: MockDriverRecord = {
+    ...record,
+    id: generateId('rec_taxi'),
+  };
+  store.driverRecords = [newRecord, ...store.driverRecords];
+  return newRecord;
+}
+
+/**
+ * Update an existing driver record
+ */
+export async function updateDriverRecord(
+  id: string,
+  updates: Partial<MockDriverRecord>
+): Promise<MockDriverRecord | null> {
+  await simulateLatency();
+  const index = store.driverRecords.findIndex(r => r.id === id);
+  if (index === -1) return null;
+  
+  const updated = { ...store.driverRecords[index], ...updates };
+  store.driverRecords = store.driverRecords.map(r => r.id === id ? updated : r);
+  return updated;
+}
+
+/**
+ * Delete a driver record
+ */
+export async function deleteDriverRecord(id: string): Promise<void> {
+  await simulateLatency();
+  store.driverRecords = store.driverRecords.filter(r => r.id !== id);
+}
+
+/**
+ * Get driver record by employee ID and date (for checking existing submission)
+ */
+export async function getDriverRecordByEmployeeAndDate(
+  employeeId: string,
+  date: string
+): Promise<MockDriverRecord | undefined> {
+  await simulateLatency();
+  return store.driverRecords.find(
+    r => r.employeeId === employeeId && r.date === date
+  );
+}
 // ============================================================================
 // WATER DELIVERY RECORDS OPERATIONS
 // ============================================================================
